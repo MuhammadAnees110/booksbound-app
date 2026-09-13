@@ -1,0 +1,126 @@
+# -----------------------------------------------------------------------------
+# PROJECT IDENTIFICATION
+# -----------------------------------------------------------------------------
+# Name of your Flutter application (must be lowercase with underscores)
+name: booksbound_app
+
+# Short explanation of what this application does
+description: "BooksBound – A full-featured digital bookstore and e-commerce platform built with Flutter and Firebase."
+
+# Prevents accidental publishing of private code to pub.dev
+publish_to: "none"
+
+# Application version for store deployment:
+# 1.0.0 is the Version Name (shown to users)
+# +1 is the Build Number (internal identifier for app stores, increases with every update)
+version: 1.0.0+1
+
+# -----------------------------------------------------------------------------
+# DART SDK VERSION REQUIREMENTS
+# -----------------------------------------------------------------------------
+environment:
+  # Sets the minimum and maximum Dart SDK versions compatible with this project
+  sdk: ^3.9.2
+
+# -----------------------------------------------------------------------------
+# PRODUCTION DEPENDENCIES (Packages compiled directly into your final app)
+# -----------------------------------------------------------------------------
+dependencies:
+  # The core Flutter framework SDK provided by Google
+  flutter:
+    sdk: flutter
+
+  # State Management: Helps share data across different screens without passing parameters everywhere
+  provider: ^6.1.5+1
+
+  # Networking: Makes HTTP requests (GET, POST) to fetch data or communicate with web REST APIs
+  http: ^1.6.0
+
+  # Animations: Renders interactive, high-quality vector Lottie animations exported from Adobe After Effects
+  lottie: ^3.3.2
+
+  # Icons: Provides iOS-style Cupertino design icons for UI elements
+  cupertino_icons: ^1.0.8
+
+  # Navigation: Adds an animated, customizable persistent bottom navigation bar across screens
+  persistent_bottom_nav_bar: ^6.2.1
+
+  # Firebase Core: Required baseline plugin to connect your app to Google Firebase backend services
+  firebase_core: ^4.4.0
+
+  # Firebase Auth: Handles user authentication (email/password login, registration, password resets)
+  firebase_auth: ^6.1.4
+
+  # Cloud Firestore: Real-time NoSQL database plugin to read, write, and query app data (books, users, orders)
+  cloud_firestore: ^6.1.2
+
+  # Firebase Storage: Cloud storage plugin to upload and download files (images, documents)
+  firebase_storage: ^13.0.4
+
+  # Device Camera/Gallery: Enables selecting photos from device storage or taking a new photo with the camera
+  image_picker: ^1.2.1
+
+# -----------------------------------------------------------------------------
+# DEVELOPMENT DEPENDENCIES (Tools used during development, omitted from final app build)
+# -----------------------------------------------------------------------------
+dev_dependencies:
+  # Core testing library provided by Flutter SDK for running unit and widget tests
+  flutter_test:
+    sdk: flutter
+
+  # Code Quality Rule-Set: Analyzes Dart code to enforce standard coding practices and syntax guidelines
+  flutter_lints: ^5.0.0
+
+  # App Icon Generator: Automatically crops, resizes, and generates launcher icons for Android & iOS platforms
+  flutter_launcher_icons: ^0.14.4
+
+# -----------------------------------------------------------------------------
+# APP LAUNCHER ICON CONFIGURATION
+# -----------------------------------------------------------------------------
+flutter_icons:
+  # Enables launcher icon generation for Android devices
+  android: true
+
+  # Enables launcher icon generation for iOS devices
+  ios: true
+
+  # Path to your high-resolution original logo image file used to build launcher icons
+  image_path: "assets/images/logo.png"
+
+# -----------------------------------------------------------------------------
+# FLUTTER FRAMEWORK & ASSETS CONFIGURATION
+# -----------------------------------------------------------------------------
+flutter:
+  # Enables Google Material Design icons, typography, and UI component styling
+  uses-material-design: true
+
+  # Static asset directories bundled into the final compiled application build
+  assets:
+    # Includes all Lottie animation JSON files inside this directory
+    - assets/lottie/
+    # Includes all static image files (PNG, JPG, SVG) inside this directory
+    - assets/images/
+
+  # Custom font family configurations declared for use in UI text themes
+  fonts:
+    # First Font Family: Poppins
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins/Poppins-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Poppins/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins/Poppins-Bold.ttf
+          weight: 700
+
+    # Second Font Family: Roboto
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf
+
+    # Third Font Family: UncialAntiqua
+    - family: UncialAntiqua
+      fonts:
+        - asset: assets/fonts/Uncial_Antiqua/UncialAntiqua-Regular.ttf

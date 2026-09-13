@@ -1,0 +1,155 @@
+import 'package:booksbound_app/providers/cart_provider.dart';
+import 'package:booksbound_app/routes/app_routes.dart';
+import 'package:booksbound_app/utils/formatters.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+class CartScreen extends StatelessWidget {
+  const CartScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final cart = context.watch<CartProvider>();
+    final cartItems = cart.items.values.toList();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'My Cart',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      ),
+      body: cartItems.isEmpty
+          ? const Center(
+              child: Text(
+                "Your cart is empty",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: cartItems.length,
+                    itemBuilder: (context, index) {
+                      final item = cartItems[index];
+
+                      return ListTile(
+                        leading: Image.network(
+                          item.book.coverUrl,
+                          width: 50,
+                          height: 70,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) {
+                            return Image.asset(
+                              'images/cover-error.png',
+                              width: 50,
+                              height: 70,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        ),
+                        title: Text(
+                          item.book.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove_circle_outline),
+                              onPressed: () {
+                                cart.decreaseQuantity(item.book.id);
+                              },
+                            ),
+                            Text(
+                              '${item.quantity}',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.add_circle_outline),
+                              onPressed: () {
+                                cart.increaseQuantity(item.book.id);
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              Formatters.formatCurrency(item.totalPrice),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.redAccent,
+                          ),
+                          onPressed: () {
+                            cart.removeItem(item.book.id);
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Total:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            Formatters.formatCurrency(cart.totalAmount),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: cart.items.isEmpty
+                              ? null
+                              : () {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pushNamed(AppRoutes.checkout);
+                                },
+                          child: const Text(
+                            'Checkout',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}

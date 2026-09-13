@@ -1,0 +1,28 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "booksbound-app-boka18",
+          "appId": "1:90194019886:android:2679e129539ab0bbba81bf",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "booksbound-app-boka18",
+          "configurations": {
+            "android": "1:90194019886:android:2679e129539ab0bbba81bf",
+            "web": "1:90194019886:web:9071c5de570de61bba81bf"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "database": "(default)",
+    "location": "asia-east1",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}
