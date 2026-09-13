@@ -135,6 +135,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 },
               ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, appRoutes.forgotPassword);
+                  },
+                  child: const Text("Forgot Password?"),
+                ),
+              ),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

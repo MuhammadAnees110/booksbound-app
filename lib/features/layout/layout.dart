@@ -92,6 +92,16 @@ class _MainLayoutState extends State<MainLayout> {
               Navigator.of(
                 context,
                 rootNavigator: true,
+              ).pushNamed(appRoutes.categories);
+            },
+            icon: const Icon(Icons.category_outlined),
+            tooltip: "Categories",
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(
+                context,
+                rootNavigator: true,
               ).pushNamed(appRoutes.wishlist);
             },
             icon: const Icon(Icons.favorite_border),

@@ -3,6 +3,7 @@ import 'package:booksbound_app/widgets/ratings.dart';
 import 'package:booksbound_app/widgets/sort_sheet.dart';
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/providers/book_provider.dart';
+import 'package:booksbound_app/providers/category_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
+                _buildCategoriesRow(context),
+                const SizedBox(height: 15),
                 _buildBookCarousel(bookProvider.bestsellers, 'Bestsellers'),
                 const SizedBox(height: 20),
                 _buildBookCarousel(bookProvider.newArrivals, 'New Arrivals'),
@@ -48,6 +51,60 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildBookGrid(bookProvider.visibleBooks, 'All Books', context),
               ],
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoriesRow(BuildContext context) {
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final categories = categoryProvider.categories;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Categories',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true).pushNamed(
+                    appRoutes.categories,
+                  );
+                },
+                child: const Text('See All'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        SizedBox(
+          height: 40,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            scrollDirection: Axis.horizontal,
+            itemCount: categories.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final cat = categories[index];
+              return ActionChip(
+                avatar: const Icon(Icons.menu_book, size: 16),
+                label: Text(cat.name),
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true).pushNamed(
+                    appRoutes.categoryBooks,
+                    arguments: cat,
+                  );
+                },
+              );
+            },
           ),
         ),
       ],

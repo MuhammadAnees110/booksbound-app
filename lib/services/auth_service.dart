@@ -72,4 +72,21 @@ class AuthService {
     // Update password
     await firebaseAuth.currentUser!.updatePassword(newPassword);
   }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await firebaseAuth.sendPasswordResetEmail(email: email.trim());
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'user-not-found':
+          throw 'No user found with this email';
+        case 'invalid-email':
+          throw 'Invalid email address format';
+        default:
+          throw e.message ?? 'Failed to send password reset email';
+      }
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 }

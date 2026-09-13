@@ -60,6 +60,9 @@ dependencies:
   # Device Camera/Gallery: Enables selecting photos from device storage or taking a new photo with the camera
   image_picker: ^1.2.1
 
+  # Local Key-Value Persistence: Saves user theme preference and local settings
+  shared_preferences: ^2.5.2
+
 # -----------------------------------------------------------------------------
 # DEVELOPMENT DEPENDENCIES (Tools used during development, omitted from final app build)
 # -----------------------------------------------------------------------------

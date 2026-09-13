@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:booksbound_app/features/book_details/widgets/write_review_sheet.dart';
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/providers/cart_provider.dart';
 import 'package:booksbound_app/providers/ratings_provider.dart';
@@ -7,6 +8,7 @@ import 'package:booksbound_app/providers/reviews_provider.dart';
 import 'package:booksbound_app/providers/wishlist_provider.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,15 +30,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       context.read<ReviewsProvider>().loadReviews(widget.book.id);
       context.read<WishlistProvider>().loadWishlist();
     });
-  }
-
-  final TextEditingController _reviewController = TextEditingController();
-  bool _isSubmittingReview = false;
-
-  @override
-  void dispose() {
-    _reviewController.dispose();
-    super.dispose();
   }
 
   @override
@@ -202,61 +195,67 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
               },
             ),
 
-            const SizedBox(height: 24),
-
-            Text(
-              'Write a review',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium!.copyWith(fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 8),
-
-            TextField(
-              controller: _reviewController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: 'Share your thoughts about this book...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: _isSubmittingReview
-                    ? null
-                    : () async {
-                        final text = _reviewController.text.trim();
-                        if (text.isEmpty) return;
-
-                        setState(() => _isSubmittingReview = true);
-
-                        await context.read<ReviewsProvider>().addReview(
-                          bookId: widget.book.id,
-                          comment: text,
+            const SizedBox(height: 16),
+            Consumer<ReviewsProvider>(
+              builder: (context, reviewsProvider, _) {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user == null) {
+                  return const SizedBox.shrink();
+                }
+                final hasReviewed = reviewsProvider.reviews.any(
+                  (r) => r.userId == user.uid,
+                );
+                if (hasReviewed) {
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.green.shade300),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'You have reviewed this book',
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 44,
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.rate_review_outlined),
+                      label: const Text('Write a Review'),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(20),
+                            ),
+                          ),
+                          builder: (_) => WriteReviewSheet(
+                            bookId: widget.book.id,
+                          ),
                         );
-
-                        if (!context.mounted) return;
-
-                        _reviewController.clear();
-                        setState(() => _isSubmittingReview = false);
                       },
-                child: _isSubmittingReview
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Post Review'),
-              ),
+                    ),
+                  ),
+                );
+              },
             ),
-
             const SizedBox(height: 15),
 
             Text(

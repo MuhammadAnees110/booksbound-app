@@ -1,4 +1,5 @@
 import 'package:booksbound_app/providers/book_provider.dart';
+import 'package:booksbound_app/providers/cart_provider.dart';
 import 'package:booksbound_app/providers/wishlist_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,72 @@ class WishlistScreen extends StatelessWidget {
     final booksProvider = Provider.of<BookProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Wishlist"), centerTitle: true),
+      appBar: AppBar(
+        title: const Text("Wishlist"),
+        centerTitle: true,
+        actions: [
+          if (wishlist.items.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.shopping_cart_checkout),
+              tooltip: "Move All to Cart",
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Move All to Cart'),
+                    content: const Text(
+                      'Do you want to move all items from your wishlist into your shopping cart?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('Cancel'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Move All'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true && context.mounted) {
+                  final cartProvider = context.read<CartProvider>();
+                  final matchingBooks = booksProvider.visibleBooks
+                      .where((b) => wishlist.items.contains(b.id))
+                      .toList();
+
+                  int count = 0;
+                  for (final book in matchingBooks) {
+                    cartProvider.addToCart(book);
+                    count++;
+                  }
+
+                  // Clear wishlist
+                  for (final book in matchingBooks) {
+                    await wishlist.removeFromWishlist(book.id);
+                  }
+
+                  if (!context.mounted) return;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('$count item(s) moved to cart'),
+                      backgroundColor: Colors.green,
+                      action: SnackBarAction(
+                        label: 'View Cart',
+                        textColor: Colors.white,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+        ],
+      ),
       body: wishlist.isLoading
           ? const Center(child: CircularProgressIndicator())
           : wishlist.items.isEmpty

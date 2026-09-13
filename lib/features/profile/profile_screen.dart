@@ -5,6 +5,7 @@ import 'package:booksbound_app/providers/book_provider.dart';
 import 'package:booksbound_app/providers/cart_provider.dart';
 import 'package:booksbound_app/providers/ratings_provider.dart';
 import 'package:booksbound_app/providers/reviews_provider.dart';
+import 'package:booksbound_app/providers/theme_provider.dart';
 import 'package:booksbound_app/providers/user_provider.dart';
 import 'package:booksbound_app/providers/user_auth_provider.dart';
 import 'package:booksbound_app/providers/wishlist_provider.dart';
@@ -208,6 +209,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
+                      ),
+                    );
+                  },
+                ),
+                Consumer<ThemeProvider>(
+                  builder: (context, themeProvider, _) {
+                    return ListTile(
+                      leading: Icon(
+                        themeProvider.isDarkMode
+                            ? Icons.dark_mode
+                            : Icons.light_mode,
+                      ),
+                      title: const Text("Dark Mode"),
+                      trailing: Switch(
+                        value: themeProvider.isDarkMode,
+                        onChanged: (_) {
+                          themeProvider.toggleTheme();
+                        },
                       ),
                     );
                   },
