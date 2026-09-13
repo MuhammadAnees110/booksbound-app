@@ -1,3 +1,4 @@
+import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import '../services/wishlist_service.dart';
 
@@ -33,6 +34,7 @@ class WishlistProvider extends ChangeNotifier {
     } else {
       _wishlistIds.add(bookId);
       await _service.addToWishlist(bookId);
+      await AnalyticsService.logWishlistAdd(bookId);
     }
     loadWishlist();
     notifyListeners();

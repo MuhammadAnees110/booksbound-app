@@ -6,6 +6,7 @@ import 'package:booksbound_app/providers/cart_provider.dart';
 import 'package:booksbound_app/providers/ratings_provider.dart';
 import 'package:booksbound_app/providers/reviews_provider.dart';
 import 'package:booksbound_app/providers/wishlist_provider.dart';
+import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,6 +25,11 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logViewItem(
+      bookId: widget.book.id,
+      title: widget.book.title,
+      price: widget.book.price,
+    );
     Future.microtask(() {
       if (!mounted) return;
       context.read<RatingsProvider>().getUserRating(widget.book.id);

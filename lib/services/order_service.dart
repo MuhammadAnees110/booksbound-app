@@ -1,6 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:booksbound_app/constants/app_constants.dart';
 import 'package:booksbound_app/models/order_model.dart';
+import 'package:booksbound_app/services/analytics_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OrderService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -10,6 +11,11 @@ class OrderService {
         .collection(AppConstants.ordersCollection)
         .doc(order.id)
         .set(order.toMap());
+
+    await AnalyticsService.logPurchaseComplete(
+      orderId: order.id,
+      total: order.totalAmount,
+    );
   }
 
   Stream<List<OrderModel>> getUserOrders(String userId) {

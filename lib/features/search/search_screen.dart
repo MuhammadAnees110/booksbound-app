@@ -1,6 +1,7 @@
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/providers/book_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
+import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +40,12 @@ class _SearchScreenState extends State<SearchScreen> {
                 setState(() {
                   _query = value.trim();
                 });
+              },
+              onSubmitted: (value) {
+                final query = value.trim();
+                if (query.isNotEmpty) {
+                  AnalyticsService.logSearch(query);
+                }
               },
               decoration: InputDecoration(
                 hintText: "Search Title, Author, ISBN no",

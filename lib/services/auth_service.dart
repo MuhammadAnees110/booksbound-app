@@ -1,6 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:booksbound_app/constants/app_constants.dart';
 import 'package:booksbound_app/models/user_model.dart';
+import 'package:booksbound_app/services/analytics_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
@@ -17,15 +18,19 @@ class AuthService {
           .collection(AppConstants.usersCollection)
           .doc(firebaseAuth.currentUser?.uid)
           .set(data.copyWith(uid: firebaseAuth.currentUser!.uid).toJson());
+      await AnalyticsService.logSignUp();
     } on FirebaseAuthException catch (e) {
       throw e.toString();
     }
   }
 
+  Future<void> signUp(UserModel data) => register(data);
+
   Future<User?> login({required String email, required String password}) async {
     try {
       final UserCredential credential = await firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
+      await AnalyticsService.logLogin('email');
       return credential.user;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {

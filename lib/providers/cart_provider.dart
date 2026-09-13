@@ -1,5 +1,6 @@
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/models/cart_item_model.dart';
+import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:flutter/material.dart';
 
 class CartProvider extends ChangeNotifier {
@@ -19,13 +20,20 @@ class CartProvider extends ChangeNotifier {
 
   double get totalPrice => totalAmount;
 
-  void addToCart(Book book) {
+  Future<void> addToCart(Book book, [int quantity = 1]) async {
     if (_items.containsKey(book.id)) {
-      _items[book.id]!.quantity++;
+      _items[book.id]!.quantity += quantity;
     } else {
-      _items[book.id] = CartItem(book: book);
+      _items[book.id] = CartItem(book: book, quantity: quantity);
     }
     notifyListeners();
+
+    await AnalyticsService.logAddToCart(
+      bookId: book.id,
+      title: book.title,
+      price: book.price,
+      quantity: quantity,
+    );
   }
 
   void removeItem(String bookId) {

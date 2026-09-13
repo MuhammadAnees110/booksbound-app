@@ -1,12 +1,19 @@
+import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/providers/book_provider.dart';
 import 'package:booksbound_app/providers/cart_provider.dart';
 import 'package:booksbound_app/providers/wishlist_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
+import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
+
+  static Future<void> addToWishlist(BuildContext context, Book book) async {
+    await context.read<WishlistProvider>().toggleWishlist(book.id);
+    await AnalyticsService.logWishlistAdd(book.id);
+  }
 
   @override
   Widget build(BuildContext context) {

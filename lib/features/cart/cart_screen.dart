@@ -1,5 +1,6 @@
 import 'package:booksbound_app/providers/cart_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
+import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -136,6 +137,10 @@ class CartScreen extends StatelessWidget {
                           onPressed: cart.items.isEmpty
                               ? null
                               : () {
+                                  AnalyticsService.logBeginCheckout(
+                                    total: cart.totalAmount,
+                                    itemCount: cart.itemsCount,
+                                  );
                                   Navigator.of(context, rootNavigator: true)
                                       .pushNamed(AppRoutes.checkout);
                                 },
