@@ -1,6 +1,7 @@
 import 'package:booksbound_app/providers/cart_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
+import 'package:booksbound_app/services/connectivity_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -136,11 +137,27 @@ class CartScreen extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: cart.items.isEmpty
                               ? null
-                              : () {
+                              : () async {
+                                  final isOnline =
+                                      await ConnectivityService.isOnline();
+                                  if (!isOnline) {
+                                    if (!context.mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Cannot checkout while offline. Please check your connection.',
+                                        ),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+
                                   AnalyticsService.logBeginCheckout(
                                     total: cart.totalAmount,
                                     itemCount: cart.itemsCount,
                                   );
+                                  if (!context.mounted) return;
                                   Navigator.of(context, rootNavigator: true)
                                       .pushNamed(AppRoutes.checkout);
                                 },

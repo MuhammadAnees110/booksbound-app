@@ -5,6 +5,7 @@ import 'package:booksbound_app/features/search/search_screen.dart';
 import 'package:booksbound_app/providers/user_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/widgets/brand.dart';
+import 'package:booksbound_app/widgets/offline_banner.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -44,7 +45,7 @@ class _MainLayoutState extends State<MainLayout> {
     const HomeScreen(),
     const SearchScreen(),
     const CartScreen(),
-    ProfileScreen(),
+    const ProfileScreen(),
   ];
 
   List<PersistentBottomNavBarItem> _navBarsItems() => [
@@ -124,24 +125,31 @@ class _MainLayoutState extends State<MainLayout> {
           ),
         ],
       ),
-      body: PersistentTabView(
-        context,
-        controller: _controller,
-        screens: _buildScreens(),
-        items: _navBarsItems(),
-        confineToSafeArea: true,
-        backgroundColor: Colors.white,
-        handleAndroidBackButtonPress: true,
-        navBarHeight: kBottomNavigationBarHeight,
-        animationSettings: const NavBarAnimationSettings(
-          screenTransitionAnimation: ScreenTransitionAnimationSettings(
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            animateTabTransition: true,
-            screenTransitionAnimationType: ScreenTransitionAnimationType.slide,
+      body: Column(
+        children: [
+          const OfflineBanner(),
+          Expanded(
+            child: PersistentTabView(
+              context,
+              controller: _controller,
+              screens: _buildScreens(),
+              items: _navBarsItems(),
+              confineToSafeArea: true,
+              backgroundColor: Colors.white,
+              handleAndroidBackButtonPress: true,
+              navBarHeight: kBottomNavigationBarHeight,
+              animationSettings: const NavBarAnimationSettings(
+                screenTransitionAnimation: ScreenTransitionAnimationSettings(
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  animateTabTransition: true,
+                  screenTransitionAnimationType: ScreenTransitionAnimationType.slide,
+                ),
+              ),
+              navBarStyle: NavBarStyle.neumorphic,
+            ),
           ),
-        ),
-        navBarStyle: NavBarStyle.neumorphic,
+        ],
       ),
     );
   }

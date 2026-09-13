@@ -72,6 +72,12 @@ dependencies:
   # URL Launcher: Opens external URLs (e.g. Privacy Policy and Terms of Service)
   url_launcher: ^6.3.0
 
+  # App Links: Deep linking support for app URL schemes and Universal/App Links
+  app_links: ^7.2.1
+
+  # Connectivity: Network status monitoring for offline resilience
+  connectivity_plus: ^7.3.1
+
 # -----------------------------------------------------------------------------
 # DEVELOPMENT DEPENDENCIES (Tools used during development, omitted from final app build)
 # -----------------------------------------------------------------------------
@@ -130,7 +136,14 @@ flutter:
     # Second Font Family: Roboto
     - family: Roboto
       fonts:
-        - asset: assets/fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf
+        - asset: assets/fonts/Roboto/static/Roboto-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Roboto/static/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Roboto/static/Roboto-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Roboto/static/Roboto-Bold.ttf
+          weight: 700
 
     # Third Font Family: UncialAntiqua
     - family: UncialAntiqua
