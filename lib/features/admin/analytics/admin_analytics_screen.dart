@@ -1,4 +1,4 @@
-import 'package:booksbound_app/features/admin/analytics/provider/admin_analytics_provider.dart';
+import 'package:booksbound_app/features/admin/analytics/providers/admin_analytics_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

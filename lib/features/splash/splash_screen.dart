@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _checkAuth();
-    _lottie = AssetLottie("lottie/books.json").load();
+    _lottie = AssetLottie("assets/lottie/books.json").load();
   }
 
   @override

@@ -1,6 +1,6 @@
 import 'package:booksbound_app/core/theme/app_theme.dart';
-import 'package:booksbound_app/features/admin/analytics/provider/admin_analytics_provider.dart';
-import 'package:booksbound_app/features/admin/manage_users/provider/admin_users_provider.dart';
+import 'package:booksbound_app/features/admin/analytics/providers/admin_analytics_provider.dart';
+import 'package:booksbound_app/features/admin/manage_users/providers/admin_users_provider.dart';
 import 'package:booksbound_app/providers/book_provider.dart';
 import 'package:booksbound_app/providers/cart_provider.dart';
 import 'package:booksbound_app/providers/ratings_provider.dart';

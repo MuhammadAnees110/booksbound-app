@@ -1,4 +1,4 @@
-import 'package:booksbound_app/features/admin/manage_users/service/admin_users_service.dart';
+import 'package:booksbound_app/features/admin/manage_users/services/admin_users_service.dart';
 import 'package:booksbound_app/models/user_model.dart';
 import 'package:flutter/material.dart';
 

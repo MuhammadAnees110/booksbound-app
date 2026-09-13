@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:booksbound_app/features/admin/manage_users/provider/admin_users_provider.dart';
+import 'package:booksbound_app/features/admin/manage_users/providers/admin_users_provider.dart';
 import 'package:booksbound_app/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
