@@ -63,6 +63,15 @@ dependencies:
   # Local Key-Value Persistence: Saves user theme preference and local settings
   shared_preferences: ^2.5.2
 
+  # Firebase App Check: Protects backend resources from abuse by attesting app requests
+  firebase_app_check: ^0.4.0
+
+  # Firebase Analytics: Tracks app usage events and user actions
+  firebase_analytics: ^12.5.0
+
+  # URL Launcher: Opens external URLs (e.g. Privacy Policy and Terms of Service)
+  url_launcher: ^6.3.0
+
 # -----------------------------------------------------------------------------
 # DEVELOPMENT DEPENDENCIES (Tools used during development, omitted from final app build)
 # -----------------------------------------------------------------------------

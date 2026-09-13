@@ -15,6 +15,7 @@ import 'package:booksbound_app/features/categories/category_books_screen.dart';
 import 'package:booksbound_app/features/change_password/change_password_screen.dart';
 import 'package:booksbound_app/features/edit_profile/edit_profile_screen.dart';
 import 'package:booksbound_app/features/layout/layout.dart';
+import 'package:booksbound_app/features/profile/delete_account_screen.dart';
 import 'package:booksbound_app/features/splash/splash_screen.dart';
 import 'package:booksbound_app/features/wishlist/wishlist_screen.dart';
 import 'package:booksbound_app/models/book_model.dart';
@@ -42,6 +43,7 @@ class AppRoutes {
       '/admin-panel/manage-reviews-books/manage-reviews';
   static const manageUsers = "/admin-panel/manage-users";
   static const analytics = "/admin-panel/analytics";
+  static const deleteAccount = '/profile/delete-account';
 
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
@@ -105,6 +107,11 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (_) => ReviewsAdminScreen(bookId: bookId),
         );
+
+      case deleteAccount:
+        return MaterialPageRoute(
+            builder: (_) => const DeleteAccountScreen());
+
       default:
         return MaterialPageRoute(
           builder: (_) =>

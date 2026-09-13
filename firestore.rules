@@ -3,7 +3,6 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -17,8 +16,47 @@ service cloud.firestore {
         get(/databases/$(database)/documents/user/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // 1. Books: Public read; Admin-only create, update, delete.
-    // Regular users can only update reviews/rating on a book.
+    // Users can read/write/delete their own profile
+    match /user/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId);
+      allow delete: if isOwner(userId) || isAdmin();
+
+      match /{allSubcollections=**} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Cart: owner can read, write, delete
+    match /cart/{itemId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // Wishlist: owner can read, write, delete
+    match /wishlist/{itemId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // Reviews: anyone can read, authenticated users can create, owner/admin can update/delete
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+
+    // Orders: owner can read, admin can read/update
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Books: anyone can read, admin can write/delete; users can update rating fields only
     match /books/{bookId} {
       allow read: if true;
       allow create, delete: if isAdmin();
@@ -28,33 +66,16 @@ service cloud.firestore {
       );
     }
 
-    // 2. User Profiles: Owner can read/write their own profile; Admin can read all and update roles/blocking.
-    match /user/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
-      allow create: if isAuthenticated() && request.auth.uid == userId;
-      allow update: if (isOwner(userId) && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'isBlocked'])))
-                    || isAdmin();
-      allow delete: if isAdmin();
-
-      match /{allSubcollections=**} {
-        allow read, write: if isOwner(userId) || isAdmin();
-      }
+    // Categories: anyone can read, admin can write
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write, delete: if isAdmin();
     }
 
-    // 3. Orders: Users can create and read their own orders; Admins can read all and update status.
-    match /orders/{orderId} {
-      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isAdmin();
-    }
-
-    // 4. Fallback for cart & wishlist collections if stored at root level
-    match /cart/{document=**} {
-      allow read, write: if isAuthenticated();
-    }
-
-    match /wishlist/{document=**} {
-      allow read, write: if isAuthenticated();
+    // Config: authenticated read, admin write
+    match /config/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
     }
   }
 }
