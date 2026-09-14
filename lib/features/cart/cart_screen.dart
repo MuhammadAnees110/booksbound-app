@@ -3,6 +3,7 @@ import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/services/connectivity_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
+import 'package:booksbound_app/utils/haptics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -61,6 +62,7 @@ class CartScreen extends StatelessWidget {
                             IconButton(
                               icon: const Icon(Icons.remove_circle_outline),
                               onPressed: () {
+                                Haptics.light();
                                 cart.decreaseQuantity(item.book.id);
                               },
                             ),
@@ -71,6 +73,7 @@ class CartScreen extends StatelessWidget {
                             IconButton(
                               icon: const Icon(Icons.add_circle_outline),
                               onPressed: () {
+                                Haptics.light();
                                 cart.increaseQuantity(item.book.id);
                               },
                             ),
@@ -89,6 +92,7 @@ class CartScreen extends StatelessWidget {
                             color: Colors.redAccent,
                           ),
                           onPressed: () {
+                            Haptics.heavy();
                             cart.removeItem(item.book.id);
                           },
                         ),
@@ -153,6 +157,7 @@ class CartScreen extends StatelessWidget {
                                     return;
                                   }
 
+                                  Haptics.light();
                                   AnalyticsService.logBeginCheckout(
                                     total: cart.totalAmount,
                                     itemCount: cart.itemsCount,

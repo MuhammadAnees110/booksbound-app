@@ -4,6 +4,7 @@ import 'package:booksbound_app/providers/cart_provider.dart';
 import 'package:booksbound_app/providers/wishlist_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
+import 'package:booksbound_app/utils/haptics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -51,6 +52,7 @@ class WishlistScreen extends StatelessWidget {
                 );
 
                 if (confirm == true && context.mounted) {
+                  Haptics.medium();
                   final cartProvider = context.read<CartProvider>();
                   final matchingBooks = booksProvider.visibleBooks
                       .where((b) => wishlist.items.contains(b.id))
@@ -116,10 +118,12 @@ class WishlistScreen extends StatelessWidget {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () async {
+                      Haptics.heavy();
                       await wishlist.removeFromWishlist(book.id);
                     },
                   ),
                   onTap: () {
+                    Haptics.light();
                     Navigator.of(
                       context,
                       rootNavigator: true,

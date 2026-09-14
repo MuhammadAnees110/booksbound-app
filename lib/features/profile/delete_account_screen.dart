@@ -1,5 +1,6 @@
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/user_service.dart';
+import 'package:booksbound_app/utils/haptics.dart';
 import 'package:flutter/material.dart';
 
 class DeleteAccountScreen extends StatefulWidget {
@@ -24,6 +25,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   Future<void> _deleteAccount() async {
     if (!_canDelete) return;
 
+    Haptics.warning();
     setState(() => _isLoading = true);
 
     try {
@@ -175,8 +177,12 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               width: double.infinity,
               height: 50,
               child: OutlinedButton(
-                onPressed:
-                    _isLoading ? null : () => Navigator.of(context).pop(),
+                onPressed: _isLoading
+                    ? null
+                    : () {
+                        Haptics.light();
+                        Navigator.of(context).pop();
+                      },
                 style: OutlinedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),

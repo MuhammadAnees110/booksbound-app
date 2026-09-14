@@ -8,6 +8,7 @@ import 'package:booksbound_app/providers/reviews_provider.dart';
 import 'package:booksbound_app/providers/wishlist_provider.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
+import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -89,6 +90,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                           size: 25,
                         ),
                         onPressed: () {
+                          Haptics.medium();
                           wishlist.toggleWishlist(widget.book.id);
                         },
                       );
@@ -179,6 +181,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                           onPressed: hasRated
                               ? null
                               : () {
+                                  Haptics.selection();
                                   ratingsProvider.rateBook(
                                     widget.book.id,
                                     index + 1,
@@ -333,6 +336,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
+                  Haptics.medium();
                   context.read<CartProvider>().addToCart(widget.book);
 
                   ScaffoldMessenger.of(context).showSnackBar(

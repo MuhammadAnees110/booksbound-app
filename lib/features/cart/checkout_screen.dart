@@ -5,6 +5,7 @@ import 'package:booksbound_app/providers/user_auth_provider.dart';
 import 'package:booksbound_app/services/order_service.dart';
 import 'package:booksbound_app/models/order_model.dart';
 import 'package:booksbound_app/utils/formatters.dart';
+import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/utils/validators.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -53,6 +54,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     try {
       await OrderService().createOrder(order);
       cartProvider.clearCart();
+      Haptics.success();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Order placed successfully!')),

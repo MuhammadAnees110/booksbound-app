@@ -10,6 +10,7 @@ import 'package:booksbound_app/providers/wishlist_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/order_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
+import 'package:booksbound_app/utils/haptics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -240,6 +241,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             trailing: Switch(
                               value: themeProvider.isDarkMode,
                               onChanged: (_) {
+                                Haptics.light();
                                 themeProvider.toggleTheme();
                               },
                             ),

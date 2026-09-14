@@ -6,6 +6,7 @@ import 'package:booksbound_app/providers/user_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/widgets/brand.dart';
 import 'package:booksbound_app/widgets/offline_banner.dart';
+import 'package:booksbound_app/utils/haptics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -134,6 +135,9 @@ class _MainLayoutState extends State<MainLayout> {
               controller: _controller,
               screens: _buildScreens(),
               items: _navBarsItems(),
+              onItemSelected: (index) {
+                Haptics.light();
+              },
               confineToSafeArea: true,
               backgroundColor: Colors.white,
               handleAndroidBackButtonPress: true,

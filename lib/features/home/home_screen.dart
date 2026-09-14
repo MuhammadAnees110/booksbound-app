@@ -1,4 +1,5 @@
 import 'package:booksbound_app/providers/wishlist_provider.dart';
+import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
 import 'package:booksbound_app/widgets/sort_sheet.dart';
 import 'package:booksbound_app/models/book_model.dart';
@@ -98,6 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 avatar: const Icon(Icons.menu_book, size: 16),
                 label: Text(cat.name),
                 onPressed: () {
+                  Haptics.light();
                   Navigator.of(context, rootNavigator: true).pushNamed(
                     appRoutes.categoryBooks,
                     arguments: cat,
@@ -136,6 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
               return InkWell(
                 borderRadius: BorderRadius.circular(14),
                 onTap: () {
+                  Haptics.light();
                   Navigator.of(
                     context,
                     rootNavigator: true,
@@ -199,6 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         size: 20,
                                       ),
                                       onPressed: () {
+                                        Haptics.medium();
                                         wishlist.toggleWishlist(book.id);
                                       },
                                     );
@@ -281,6 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
               return InkWell(
                 borderRadius: BorderRadius.circular(16),
                 onTap: () {
+                  Haptics.light();
                   Navigator.of(
                     context,
                     rootNavigator: true,
@@ -340,6 +345,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           size: 25,
                                         ),
                                         onPressed: () {
+                                          Haptics.medium();
                                           wishlist.toggleWishlist(book.id);
                                         },
                                       );
