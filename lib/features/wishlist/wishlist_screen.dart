@@ -104,7 +104,7 @@ class WishlistScreen extends StatelessWidget {
         child: wishlist.isLoading
             ? ListView.builder(
                 itemCount: 5,
-                itemBuilder: (_, __) => const BookListTileSkeleton(),
+                itemBuilder: (_, _) => const BookListTileSkeleton(),
               )
             : wishlist.items.isEmpty
                 ? SingleChildScrollView(

@@ -26,7 +26,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Manage Users')),
       body: Consumer<AdminUsersProvider>(
-        builder: (_, provider, __) {
+        builder: (_, provider, _) {
           if (provider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }

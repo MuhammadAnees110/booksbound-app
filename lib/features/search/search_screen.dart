@@ -70,7 +70,7 @@ class _SearchScreenState extends State<SearchScreen> {
             child: bookProvider.isloading
                 ? ListView.builder(
                     itemCount: 6,
-                    itemBuilder: (_, __) => const BookListTileSkeleton(),
+                    itemBuilder: (_, _) => const BookListTileSkeleton(),
                   )
                 : _query.isEmpty
                     ? _buildEmptyState()

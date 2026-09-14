@@ -30,7 +30,7 @@ class CategoriesScreen extends StatelessWidget {
                 childAspectRatio: 0.85,
               ),
               itemCount: 6,
-              itemBuilder: (_, __) => const Skeleton(
+              itemBuilder: (_, _) => const Skeleton(
                 width: double.infinity,
                 height: double.infinity,
                 radius: 16,

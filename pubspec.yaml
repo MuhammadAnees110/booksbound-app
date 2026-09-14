@@ -82,7 +82,7 @@ dependencies:
   flutter_animate: ^4.5.0
 
   # Cached network images for fast loading and offline image cache
-  cached_network_image: ^3.4.1
+  cached_network_image: ^4.0.0
 
 # -----------------------------------------------------------------------------
 # DEVELOPMENT DEPENDENCIES (Tools used during development, omitted from final app build)
@@ -93,7 +93,7 @@ dev_dependencies:
     sdk: flutter
 
   # Code Quality Rule-Set: Analyzes Dart code to enforce standard coding practices and syntax guidelines
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
   # App Icon Generator: Automatically crops, resizes, and generates launcher icons for Android & iOS platforms
   flutter_launcher_icons: ^0.14.4

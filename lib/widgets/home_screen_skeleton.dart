@@ -32,8 +32,8 @@ class HomeScreenSkeleton extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: 5,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (_, __) =>
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
+              itemBuilder: (_, _) =>
                   const Skeleton(width: 90, height: 38, radius: 20),
             ),
           ),
@@ -51,8 +51,8 @@ class HomeScreenSkeleton extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: 4,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (_, __) => Container(
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              itemBuilder: (_, _) => Container(
                 width: 140,
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
@@ -98,7 +98,7 @@ class HomeScreenSkeleton extends StatelessWidget {
                 childAspectRatio: 0.62,
               ),
               itemCount: 4,
-              itemBuilder: (_, __) => const BookCardSkeleton(),
+              itemBuilder: (_, _) => const BookCardSkeleton(),
             ),
           ),
           const SizedBox(height: 20),

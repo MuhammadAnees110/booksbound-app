@@ -205,9 +205,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           return ListView.separated(
                                             controller: scrollController,
                                             itemCount: 4,
-                                            separatorBuilder: (_, __) =>
+                                            separatorBuilder: (_, _) =>
                                                 const SizedBox(height: 8),
-                                            itemBuilder: (_, __) =>
+                                            itemBuilder: (_, _) =>
                                                 const Padding(
                                               padding: EdgeInsets.symmetric(
                                                   horizontal: 16.0,
@@ -233,7 +233,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         return ListView.separated(
                                           controller: scrollController,
                                           itemCount: orders.length,
-                                          separatorBuilder: (_, __) =>
+                                          separatorBuilder: (_, _) =>
                                               const Divider(height: 1),
                                           itemBuilder: (context, index) {
                                             final order = orders[index];

@@ -79,7 +79,7 @@ class CategoryBooksScreen extends StatelessWidget {
             return ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: 5,
-              itemBuilder: (_, __) => const BookListTileSkeleton(),
+              itemBuilder: (_, _) => const BookListTileSkeleton(),
             );
           }
 
@@ -105,7 +105,7 @@ class CategoryBooksScreen extends StatelessWidget {
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: books.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            separatorBuilder: (_, _) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final book = books[index];
               return InkWell(

@@ -151,7 +151,7 @@ class _BookFormDialogState extends State<BookFormDialog> {
                           child: Image.network(
                             widget.book!.coverUrl,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                            errorBuilder: (_, _, _) => _buildPlaceholder(),
                           ),
                         )
                       : _buildPlaceholder(),

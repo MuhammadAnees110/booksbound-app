@@ -111,7 +111,7 @@ class _ManageBooksScreenState extends State<ManageBooksScreen> {
                   width: 50,
                   height: 70,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
+                  errorBuilder: (_, _, _) =>
                       const Icon(Icons.book, size: 40),
                 ),
               )
