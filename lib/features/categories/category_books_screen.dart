@@ -1,9 +1,13 @@
-﻿import 'package:booksbound_app/models/book_model.dart';
+import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/models/category_model.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/books_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
+import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/book_card_skeleton.dart';
+import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
 
 class CategoryBooksScreen extends StatelessWidget {
@@ -20,17 +24,72 @@ class CategoryBooksScreen extends StatelessWidget {
         title: Text(category.name),
         centerTitle: true,
       ),
-      body: FutureBuilder<List<Book>>(
-        future: booksService.getBooksByGenre(category.name),
-        builder: (context, snapshot) {
+      body: Column(
+        children: [
+          if (category.imageUrl.isNotEmpty)
+            Hero(
+              tag: 'category-${category.id}',
+              child: SizedBox(
+                height: 110,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.network(
+                      category.imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        color: Colors.blueGrey.shade100,
+                        child: const Icon(Icons.menu_book, size: 40),
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.7),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (category.description.isNotEmpty)
+                      Positioned(
+                        bottom: 10,
+                        left: 16,
+                        right: 16,
+                        child: Text(
+                          category.description,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          Expanded(
+            child: FutureBuilder<List<Book>>(
+              future: booksService.getBooksByGenre(category.name),
+              builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: 5,
+              itemBuilder: (_, __) => const BookListTileSkeleton(),
+            );
           }
 
           if (snapshot.hasError) {
-            return Center(
+            return const Center(
               child: Text(
-                'Error loading books: ',
+                'Error loading books',
                 textAlign: TextAlign.center,
               ),
             );
@@ -39,18 +98,10 @@ class CategoryBooksScreen extends StatelessWidget {
           final books = snapshot.data ?? [];
 
           if (books.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.menu_book_outlined, size: 64, color: Colors.grey),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No books found in ""',
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                ],
-              ),
+            return EmptyState(
+              icon: Icons.menu_book_outlined,
+              title: "No books found",
+              subtitle: 'No books found in "${category.name}"',
             );
           }
 
@@ -62,6 +113,7 @@ class CategoryBooksScreen extends StatelessWidget {
               final book = books[index];
               return InkWell(
                 onTap: () {
+                  Haptics.light();
                   Navigator.of(context, rootNavigator: true).pushNamed(
                     AppRoutes.bookDetails,
                     arguments: book,
@@ -149,11 +201,17 @@ class CategoryBooksScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-              );
+              )
+                  .animate(delay: ((index % 6) * 50).ms)
+                  .fadeIn(duration: 250.ms)
+                  .slideY(begin: 0.1);
             },
           );
         },
       ),
-    );
-  }
+    ),
+  ],
+),
+);
+}
 }

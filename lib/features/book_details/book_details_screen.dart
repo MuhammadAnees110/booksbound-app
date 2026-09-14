@@ -53,13 +53,16 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
             Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  widget.book.coverUrl,
-                  height: 260,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) {
-                    return Image.asset('images/cover-error.png', height: 260);
-                  },
+                child: Hero(
+                  tag: 'book-cover-${widget.book.id}',
+                  child: Image.network(
+                    widget.book.coverUrl,
+                    height: 260,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) {
+                      return Image.asset('images/cover-error.png', height: 260);
+                    },
+                  ),
                 ),
               ),
             ),

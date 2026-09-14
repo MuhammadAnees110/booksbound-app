@@ -7,6 +7,7 @@ import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/book_card_skeleton.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -91,24 +92,39 @@ class WishlistScreen extends StatelessWidget {
             ),
         ],
       ),
-      body: wishlist.isLoading
-          ? ListView.builder(
-              itemCount: 5,
-              itemBuilder: (_, __) => const BookListTileSkeleton(),
-            )
-          : wishlist.items.isEmpty
-              ? EmptyState(
-                  icon: Icons.favorite_border,
-                  title: "No favorites yet",
-                  subtitle: "Tap the heart on any book to save it here",
-                  actionText: "Discover Books",
-                  onAction: () {
-                    Haptics.light();
-                    Navigator.of(context, rootNavigator: true)
-                        .pushNamed(AppRoutes.categories);
-                  },
-                )
-              : ListView.builder(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          Haptics.light();
+          await Future.wait([
+            wishlist.loadWishlist(),
+            booksProvider.loadBooks(),
+          ]);
+        },
+        child: wishlist.isLoading
+            ? ListView.builder(
+                itemCount: 5,
+                itemBuilder: (_, __) => const BookListTileSkeleton(),
+              )
+            : wishlist.items.isEmpty
+                ? SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: EmptyState(
+                        icon: Icons.favorite_border,
+                        title: "No favorites yet",
+                        subtitle: "Tap the heart on any book to save it here",
+                        actionText: "Discover Books",
+                        onAction: () {
+                          Haptics.light();
+                          Navigator.of(context, rootNavigator: true)
+                              .pushNamed(AppRoutes.categories);
+                        },
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
               itemCount: wishlist.items.length,
               itemBuilder: (context, index) {
                 final books = booksProvider.visibleBooks
@@ -144,9 +160,13 @@ class WishlistScreen extends StatelessWidget {
                       rootNavigator: true,
                     ).pushNamed(appRoutes.bookDetails, arguments: book);
                   },
-                );
+                )
+                    .animate(delay: ((index % 6) * 50).ms)
+                    .fadeIn(duration: 250.ms)
+                    .slideY(begin: 0.1);
               },
             ),
+      ),
     );
   }
 }

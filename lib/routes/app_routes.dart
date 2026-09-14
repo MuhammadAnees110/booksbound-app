@@ -20,6 +20,7 @@ import 'package:booksbound_app/features/splash/splash_screen.dart';
 import 'package:booksbound_app/features/wishlist/wishlist_screen.dart';
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/models/category_model.dart';
+import 'package:booksbound_app/utils/page_transitions.dart';
 import 'package:flutter/material.dart';
 
 class AppRoutes {
@@ -64,58 +65,95 @@ class AppRoutes {
     switch (settings.name) {
       case bookDetails:
         final book = settings.arguments as Book;
-        return MaterialPageRoute(builder: (_) => BookDetailsScreen(book: book));
+        return SlideRightRoute(
+          page: BookDetailsScreen(book: book),
+          settings: settings,
+        );
 
       case editProfile:
-        return MaterialPageRoute(builder: (_) => const EditProfileScreen());
+        return SlideRightRoute(
+          page: const EditProfileScreen(),
+          settings: settings,
+        );
 
       case forgotPassword:
-        return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
+        return SlideRightRoute(
+          page: const ForgotPasswordScreen(),
+          settings: settings,
+        );
 
       case changePassword:
-        return MaterialPageRoute(builder: (_) => const ChangePasswordScreen());
+        return SlideRightRoute(
+          page: const ChangePasswordScreen(),
+          settings: settings,
+        );
 
       case wishlist:
-        return MaterialPageRoute(builder: (_) => const WishlistScreen());
+        return FadeRoute(
+          page: const WishlistScreen(),
+          settings: settings,
+        );
 
       case categories:
-        return MaterialPageRoute(builder: (_) => const CategoriesScreen());
+        return FadeRoute(
+          page: const CategoriesScreen(),
+          settings: settings,
+        );
 
       case categoryBooks:
         final category = settings.arguments as CategoryModel;
-        return MaterialPageRoute(
-          builder: (_) => CategoryBooksScreen(category: category),
+        return SlideRightRoute(
+          page: CategoryBooksScreen(category: category),
+          settings: settings,
         );
 
       case checkout:
-        return MaterialPageRoute(builder: (_) => const CheckoutScreen());
+        return SlideRightRoute(
+          page: const CheckoutScreen(),
+          settings: settings,
+        );
 
       case adminPanel:
-        return MaterialPageRoute(builder: (_) => const AdminPanelScreen());
+        return FadeRoute(
+          page: const AdminPanelScreen(),
+          settings: settings,
+        );
 
       case manageBooks:
-        return MaterialPageRoute(builder: (_) => const ManageBooksScreen());
+        return SlideRightRoute(
+          page: const ManageBooksScreen(),
+          settings: settings,
+        );
 
       case manageOrders:
-        return MaterialPageRoute(builder: (_) => const ManageOrdersScreen());
+        return SlideRightRoute(
+          page: const ManageOrdersScreen(),
+          settings: settings,
+        );
 
       case manageReviewsBooks:
-        return MaterialPageRoute(builder: (_) => const ReviewsbooksScreen());
+        return SlideRightRoute(
+          page: const ReviewsbooksScreen(),
+          settings: settings,
+        );
 
       case manageReviews:
         final bookId = settings.arguments as String;
-        return MaterialPageRoute(
-          builder: (_) => ReviewsAdminScreen(bookId: bookId),
+        return SlideRightRoute(
+          page: ReviewsAdminScreen(bookId: bookId),
+          settings: settings,
         );
 
       case deleteAccount:
-        return MaterialPageRoute(
-            builder: (_) => const DeleteAccountScreen());
+        return SlideRightRoute(
+          page: const DeleteAccountScreen(),
+          settings: settings,
+        );
 
       default:
-        return MaterialPageRoute(
-          builder: (_) =>
-              const Scaffold(body: Center(child: Text('Route not found'))),
+        return FadeRoute(
+          page: const Scaffold(body: Center(child: Text('Route not found'))),
+          settings: settings,
         );
     }
   }

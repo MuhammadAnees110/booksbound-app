@@ -270,10 +270,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Consumer<ThemeProvider>(
                         builder: (context, themeProvider, _) {
                           return ListTile(
-                            leading: Icon(
-                              themeProvider.isDarkMode
-                                  ? Icons.dark_mode
-                                  : Icons.light_mode,
+                            leading: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 350),
+                              transitionBuilder: (child, anim) =>
+                                  RotationTransition(
+                                turns: anim,
+                                child: FadeTransition(
+                                  opacity: anim,
+                                  child: child,
+                                ),
+                              ),
+                              child: Icon(
+                                themeProvider.isDarkMode
+                                    ? Icons.dark_mode
+                                    : Icons.light_mode,
+                                key: ValueKey(themeProvider.isDarkMode),
+                              ),
                             ),
                             title: const Text("Dark Mode"),
                             trailing: Switch(

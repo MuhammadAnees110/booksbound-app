@@ -3,8 +3,10 @@ import 'package:booksbound_app/providers/book_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
+import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/book_card_skeleton.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -95,12 +97,16 @@ class _SearchScreenState extends State<SearchScreen> {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         onTap: () {
+                          Haptics.light();
                           Navigator.of(
                             context,
                             rootNavigator: true,
                           ).pushNamed(appRoutes.bookDetails, arguments: book);
                         },
-                      );
+                      )
+                          .animate(delay: ((index % 6) * 50).ms)
+                          .fadeIn(duration: 250.ms)
+                          .slideY(begin: 0.1);
                     },
                   ),
           ),

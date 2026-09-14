@@ -3,6 +3,7 @@ import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/home_screen_skeleton.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
 import 'package:booksbound_app/widgets/sort_sheet.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/providers/book_provider.dart';
 import 'package:booksbound_app/providers/category_provider.dart';
@@ -36,26 +37,36 @@ class _HomeScreenState extends State<HomeScreen> {
       return const HomeScreenSkeleton();
     }
 
-    return Column(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 10),
-                _buildCategoriesRow(context),
-                const SizedBox(height: 15),
-                _buildBookCarousel(bookProvider.bestsellers, 'Bestsellers'),
-                const SizedBox(height: 20),
-                _buildBookCarousel(bookProvider.newArrivals, 'New Arrivals'),
-                const SizedBox(height: 20),
-                _buildBookGrid(bookProvider.visibleBooks, 'All Books', context),
-              ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        Haptics.light();
+        await Future.wait([
+          context.read<BookProvider>().loadBooks(),
+          context.read<CategoryProvider>().loadCategories(),
+        ]);
+      },
+      child: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  _buildCategoriesRow(context),
+                  const SizedBox(height: 15),
+                  _buildBookCarousel(bookProvider.bestsellers, 'Bestsellers'),
+                  const SizedBox(height: 20),
+                  _buildBookCarousel(bookProvider.newArrivals, 'New Arrivals'),
+                  const SizedBox(height: 20),
+                  _buildBookGrid(bookProvider.visibleBooks, 'All Books', context),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -106,7 +117,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     arguments: cat,
                   );
                 },
-              );
+              )
+                  .animate()
+                  .fadeIn(duration: 250.ms)
+                  .slideX(begin: -0.2);
             },
           ),
         ),
@@ -235,7 +249,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-              );
+              )
+                  .animate()
+                  .fadeIn(duration: 300.ms)
+                  .slideX(begin: 0.1);
             },
           ),
         ),
@@ -314,16 +331,19 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  book.coverUrl,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) {
-                                    return Image.asset(
-                                      'images/cover-error.png',
-                                      fit: BoxFit.fitWidth,
-                                    );
-                                  },
+                                child: Hero(
+                                  tag: 'book-cover-${book.id}',
+                                  child: Image.network(
+                                    book.coverUrl,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) {
+                                      return Image.asset(
+                                        'images/cover-error.png',
+                                        fit: BoxFit.fitWidth,
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                               Positioned(
@@ -384,7 +404,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-              );
+              )
+                  .animate(delay: ((index % 6) * 50).ms)
+                  .fadeIn(duration: 300.ms)
+                  .slideY(begin: 0.1);
             },
           ),
         ),
