@@ -139,7 +139,9 @@ class _MainLayoutState extends State<MainLayout> {
                 Haptics.light();
               },
               confineToSafeArea: true,
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xEE1C1C1E)
+                  : const Color(0xEEFFFFFF),
               handleAndroidBackButtonPress: true,
               navBarHeight: kBottomNavigationBarHeight,
               animationSettings: const NavBarAnimationSettings(

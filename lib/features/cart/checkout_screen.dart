@@ -8,6 +8,8 @@ import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/utils/validators.dart';
 import 'package:booksbound_app/widgets/primary_button.dart';
+import 'package:booksbound_app/features/checkout/order_success_screen.dart';
+import 'package:booksbound_app/utils/page_transitions.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -57,10 +59,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       cartProvider.clearCart();
       Haptics.success();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Order placed successfully!')),
+        Navigator.of(context, rootNavigator: true).pushReplacement(
+          FadeRoute(
+            page: OrderSuccessScreen(
+              orderId: order.id,
+              totalAmount: order.totalAmount,
+            ),
+          ),
         );
-        Navigator.popUntil(context, (route) => route.isFirst);
       }
     } catch (e) {
       if (mounted) {
