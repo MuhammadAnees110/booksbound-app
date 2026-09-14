@@ -53,14 +53,18 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Hero(
-                  tag: 'book-cover-${widget.book.id}',
-                  child: CachedImage(
-                    imageUrl: widget.book.coverUrl,
-                    height: 260,
-                    fit: BoxFit.cover,
+              child: Semantics(
+                label: 'Book cover for ${widget.book.title}',
+                image: true,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Hero(
+                    tag: 'book-cover-${widget.book.id}',
+                    child: CachedImage(
+                      imageUrl: widget.book.coverUrl,
+                      height: 260,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
@@ -88,6 +92,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                       );
                       return IconButton(
                         padding: EdgeInsets.zero,
+                        tooltip: isWishlisted
+                            ? 'Remove from wishlist'
+                            : 'Add to wishlist',
                         icon: Icon(
                           isWishlisted ? Icons.favorite : Icons.favorite_border,
                           color: Colors.red,
@@ -349,6 +356,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
+                            tooltip: provider.isLikedBy(review)
+                                ? 'Unlike review'
+                                : 'Like review',
                             icon: Icon(
                               provider.isLikedBy(review)
                                   ? Icons.favorite
@@ -356,6 +366,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                               color: Colors.red,
                             ),
                             onPressed: () {
+                              Haptics.light();
                               provider.toggleLike(
                                 bookId: widget.book.id,
                                 review: review,

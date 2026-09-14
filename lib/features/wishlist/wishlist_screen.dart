@@ -132,31 +132,36 @@ class WishlistScreen extends StatelessWidget {
                     .where((b) => wishlist.items.contains(b.id))
                     .toList();
                 final book = books[index];
-                return ListTile(
-                  leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: CachedImage(
-                      imageUrl: book.coverUrl,
-                      width: 50,
-                      fit: BoxFit.cover,
+                return Semantics(
+                  label: '${book.title} by ${book.author}',
+                  button: true,
+                  child: ListTile(
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: CachedImage(
+                        imageUrl: book.coverUrl,
+                        width: 50,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                  title: Text(book.title),
-                  subtitle: Text(book.author),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () async {
-                      Haptics.heavy();
-                      await wishlist.removeFromWishlist(book.id);
+                    title: Text(book.title),
+                    subtitle: Text(book.author),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      tooltip: 'Remove from wishlist',
+                      onPressed: () async {
+                        Haptics.heavy();
+                        await wishlist.removeFromWishlist(book.id);
+                      },
+                    ),
+                    onTap: () {
+                      Haptics.light();
+                      Navigator.of(
+                        context,
+                        rootNavigator: true,
+                      ).pushNamed(appRoutes.bookDetails, arguments: book);
                     },
                   ),
-                  onTap: () {
-                    Haptics.light();
-                    Navigator.of(
-                      context,
-                      rootNavigator: true,
-                    ).pushNamed(appRoutes.bookDetails, arguments: book);
-                  },
                 )
                     .animate(delay: ((index % 6) * 50).ms)
                     .fadeIn(duration: 250.ms)

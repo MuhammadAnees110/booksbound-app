@@ -107,6 +107,7 @@ class _MainLayoutState extends State<MainLayout> {
               ).pushNamed(appRoutes.wishlist);
             },
             icon: const Icon(Icons.favorite_border),
+            tooltip: "Wishlist",
           ),
           Consumer<ProfileProvider>(
             builder: (context, provider, _) {
@@ -119,6 +120,7 @@ class _MainLayoutState extends State<MainLayout> {
                     ).pushNamed(appRoutes.adminPanel);
                   },
                   icon: const Icon(Icons.dashboard),
+                  tooltip: "Admin Panel",
                 );
               }
               return const SizedBox.shrink();

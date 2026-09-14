@@ -1,5 +1,6 @@
-﻿import 'package:booksbound_app/providers/ratings_provider.dart';
+import 'package:booksbound_app/providers/ratings_provider.dart';
 import 'package:booksbound_app/providers/reviews_provider.dart';
+import 'package:booksbound_app/utils/haptics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +17,12 @@ class _WriteReviewSheetState extends State<WriteReviewSheet> {
   final _commentController = TextEditingController();
   int _selectedRating = 5;
   bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Haptics.light();
+  }
 
   @override
   void dispose() {
@@ -84,6 +91,17 @@ class _WriteReviewSheetState extends State<WriteReviewSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Center(
+            child: Container(
+              width: 36,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey.withAlpha(100),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -95,6 +113,7 @@ class _WriteReviewSheetState extends State<WriteReviewSheet> {
               ),
               IconButton(
                 icon: const Icon(Icons.close),
+                tooltip: 'Close',
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -109,15 +128,21 @@ class _WriteReviewSheetState extends State<WriteReviewSheet> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(5, (index) {
               final starValue = index + 1;
-              return IconButton(
-                icon: Icon(
-                  starValue <= _selectedRating ? Icons.star : Icons.star_border,
-                  color: Colors.amber,
-                  size: 36,
+              return Semantics(
+                label: 'Rate $starValue out of 5 stars',
+                button: true,
+                child: IconButton(
+                  tooltip: 'Rate $starValue ${starValue == 1 ? "star" : "stars"}',
+                  icon: Icon(
+                    starValue <= _selectedRating ? Icons.star : Icons.star_border,
+                    color: Colors.amber,
+                    size: 36,
+                  ),
+                  onPressed: () {
+                    Haptics.selection();
+                    setState(() => _selectedRating = starValue);
+                  },
                 ),
-                onPressed: () {
-                  setState(() => _selectedRating = starValue);
-                },
               );
             }),
           ),

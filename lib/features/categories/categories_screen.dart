@@ -64,15 +64,18 @@ class CategoriesScreen extends StatelessWidget {
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final cat = categories[index];
-                return InkWell(
-                  onTap: () {
-                    Haptics.light();
-                    Navigator.of(context, rootNavigator: true).pushNamed(
-                      AppRoutes.categoryBooks,
-                      arguments: cat,
-                    );
-                  },
-                  borderRadius: BorderRadius.circular(16),
+                return Semantics(
+                  label: 'Category: ${cat.name}',
+                  button: true,
+                  child: InkWell(
+                    onTap: () {
+                      Haptics.light();
+                      Navigator.of(context, rootNavigator: true).pushNamed(
+                        AppRoutes.categoryBooks,
+                        arguments: cat,
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(16),
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
@@ -141,6 +144,7 @@ class CategoriesScreen extends StatelessWidget {
                           ),
                         ],
                       ),
+                    ),
                     ),
                   ),
                 )

@@ -64,17 +64,28 @@ class CartScreen extends StatelessWidget {
                           children: [
                             IconButton(
                               icon: const Icon(Icons.remove_circle_outline),
+                              tooltip: 'Decrease quantity',
                               onPressed: () {
                                 Haptics.light();
                                 cart.decreaseQuantity(item.book.id);
                               },
                             ),
-                            Text(
-                              '${item.quantity}',
-                              style: const TextStyle(fontSize: 16),
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              transitionBuilder: (child, animation) =>
+                                  ScaleTransition(scale: animation, child: child),
+                              child: Text(
+                                '${item.quantity}',
+                                key: ValueKey<int>(item.quantity),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                             IconButton(
                               icon: const Icon(Icons.add_circle_outline),
+                              tooltip: 'Increase quantity',
                               onPressed: () {
                                 Haptics.light();
                                 cart.increaseQuantity(item.book.id);
@@ -91,9 +102,10 @@ class CartScreen extends StatelessWidget {
                         ),
                         trailing: IconButton(
                           icon: const Icon(
-                            Icons.delete,
+                            Icons.delete_outline,
                             color: Colors.redAccent,
                           ),
+                          tooltip: 'Remove from cart',
                           onPressed: () {
                             Haptics.heavy();
                             cart.removeItem(item.book.id);

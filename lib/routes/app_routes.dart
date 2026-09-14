@@ -18,6 +18,7 @@ import 'package:booksbound_app/features/layout/layout.dart';
 import 'package:booksbound_app/features/profile/delete_account_screen.dart';
 import 'package:booksbound_app/features/splash/splash_screen.dart';
 import 'package:booksbound_app/features/wishlist/wishlist_screen.dart';
+import 'package:booksbound_app/features/checkout/order_success_screen.dart';
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/models/category_model.dart';
 import 'package:booksbound_app/utils/page_transitions.dart';
@@ -45,6 +46,7 @@ class AppRoutes {
   static const manageUsers = "/admin-panel/manage-users";
   static const analytics = "/admin-panel/analytics";
   static const deleteAccount = '/profile/delete-account';
+  static const orderSuccess = '/checkout/order-success';
 
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
@@ -147,6 +149,16 @@ class AppRoutes {
       case deleteAccount:
         return SlideRightRoute(
           page: const DeleteAccountScreen(),
+          settings: settings,
+        );
+
+      case orderSuccess:
+        final args = settings.arguments as Map<String, dynamic>;
+        return FadeRoute(
+          page: OrderSuccessScreen(
+            orderId: args['orderId'] as String,
+            totalAmount: args['totalAmount'] as double,
+          ),
           settings: settings,
         );
 

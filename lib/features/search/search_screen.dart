@@ -80,28 +80,32 @@ class _SearchScreenState extends State<SearchScreen> {
                     itemCount: results.length,
                     itemBuilder: (context, index) {
                       final book = results[index];
-                      return ListTile(
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
-                          child: CachedImage(
-                            imageUrl: book.coverUrl,
-                            width: 45,
-                            fit: BoxFit.cover,
+                      return Semantics(
+                        label: '${book.title} by ${book.author}, ${Formatters.formatCurrency(book.price)}',
+                        button: true,
+                        child: ListTile(
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: CachedImage(
+                              imageUrl: book.coverUrl,
+                              width: 45,
+                              fit: BoxFit.cover,
+                            ),
                           ),
+                          title: Text(book.title),
+                          subtitle: Text(book.author),
+                          trailing: Text(
+                            Formatters.formatCurrency(book.price),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          onTap: () {
+                            Haptics.light();
+                            Navigator.of(
+                              context,
+                              rootNavigator: true,
+                            ).pushNamed(appRoutes.bookDetails, arguments: book);
+                          },
                         ),
-                        title: Text(book.title),
-                        subtitle: Text(book.author),
-                        trailing: Text(
-                          Formatters.formatCurrency(book.price),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        onTap: () {
-                          Haptics.light();
-                          Navigator.of(
-                            context,
-                            rootNavigator: true,
-                          ).pushNamed(appRoutes.bookDetails, arguments: book);
-                        },
                       )
                           .animate(delay: ((index % 6) * 50).ms)
                           .fadeIn(duration: 250.ms)
