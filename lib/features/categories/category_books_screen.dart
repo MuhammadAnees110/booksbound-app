@@ -5,6 +5,7 @@ import 'package:booksbound_app/services/books_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/book_card_skeleton.dart';
+import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -35,13 +36,9 @@ class CategoryBooksScreen extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.network(
-                      category.imageUrl,
+                    CachedImage(
+                      imageUrl: category.imageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: Colors.blueGrey.shade100,
-                        child: const Icon(Icons.menu_book, size: 40),
-                      ),
                     ),
                     Container(
                       decoration: BoxDecoration(
@@ -137,17 +134,11 @@ class CategoryBooksScreen extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          book.coverUrl,
+                        child: CachedImage(
+                          imageUrl: book.coverUrl,
                           width: 60,
                           height: 85,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Image.asset(
-                            'images/cover-error.png',
-                            width: 60,
-                            height: 85,
-                            fit: BoxFit.cover,
-                          ),
                         ),
                       ),
                       const SizedBox(width: 14),

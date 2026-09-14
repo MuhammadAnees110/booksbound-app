@@ -5,6 +5,7 @@ import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/book_card_skeleton.dart';
+import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
@@ -82,12 +83,10 @@ class _SearchScreenState extends State<SearchScreen> {
                       return ListTile(
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(6),
-                          child: Image.network(
-                            book.coverUrl,
+                          child: CachedImage(
+                            imageUrl: book.coverUrl,
                             width: 45,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
-                                Image.asset('images/cover-error.png'),
                           ),
                         ),
                         title: Text(book.title),

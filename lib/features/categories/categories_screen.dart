@@ -1,6 +1,7 @@
 import 'package:booksbound_app/providers/category_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:booksbound_app/widgets/skeleton.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -90,17 +91,9 @@ class CategoriesScreen extends StatelessWidget {
                         children: [
                           Hero(
                             tag: 'category-${cat.id}',
-                            child: Image.network(
-                              cat.imageUrl,
+                            child: CachedImage(
+                              imageUrl: cat.imageUrl,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                color: Colors.blueGrey.shade100,
-                                child: const Icon(
-                                  Icons.menu_book,
-                                  size: 48,
-                                  color: Colors.grey,
-                                ),
-                              ),
                             ),
                           ),
                           Container(

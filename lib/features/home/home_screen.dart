@@ -1,5 +1,6 @@
 import 'package:booksbound_app/providers/wishlist_provider.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:booksbound_app/widgets/home_screen_skeleton.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
 import 'package:booksbound_app/widgets/sort_sheet.dart';
@@ -179,18 +180,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                book.coverUrl,
+                              child: CachedImage(
+                                imageUrl: book.coverUrl,
                                 height: 140,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) {
-                                  return Image.asset(
-                                    'images/cover-error.png',
-                                    height: 140,
-                                    fit: BoxFit.cover,
-                                  );
-                                },
                               ),
                             ),
                             Positioned(
@@ -327,16 +321,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 borderRadius: BorderRadius.circular(12),
                                 child: Hero(
                                   tag: 'book-cover-${book.id}',
-                                  child: Image.network(
-                                    book.coverUrl,
+                                  child: CachedImage(
+                                    imageUrl: book.coverUrl,
                                     width: double.infinity,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) {
-                                      return Image.asset(
-                                        'images/cover-error.png',
-                                        fit: BoxFit.fitWidth,
-                                      );
-                                    },
                                   ),
                                 ),
                               ),

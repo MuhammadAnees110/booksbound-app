@@ -6,6 +6,7 @@ import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/book_card_skeleton.dart';
+import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
@@ -132,17 +133,13 @@ class WishlistScreen extends StatelessWidget {
                     .toList();
                 final book = books[index];
                 return ListTile(
-                  leading: Image.network(
-                    book.coverUrl,
-                    width: 50,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) {
-                      return Image.asset(
-                        'images/cover-error.png',
-                        width: 50,
-                        fit: BoxFit.cover,
-                      );
-                    },
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: CachedImage(
+                      imageUrl: book.coverUrl,
+                      width: 50,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                   title: Text(book.title),
                   subtitle: Text(book.author),

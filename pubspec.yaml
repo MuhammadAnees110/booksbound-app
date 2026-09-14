@@ -81,6 +81,9 @@ dependencies:
   # Declarative animations
   flutter_animate: ^4.5.0
 
+  # Cached network images for fast loading and offline image cache
+  cached_network_image: ^3.4.1
+
 # -----------------------------------------------------------------------------
 # DEVELOPMENT DEPENDENCIES (Tools used during development, omitted from final app build)
 # -----------------------------------------------------------------------------

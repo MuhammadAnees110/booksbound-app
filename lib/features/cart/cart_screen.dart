@@ -4,6 +4,7 @@ import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/services/connectivity_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:booksbound_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
@@ -45,19 +46,14 @@ class CartScreen extends StatelessWidget {
                       final item = cartItems[index];
 
                       return ListTile(
-                        leading: Image.network(
-                          item.book.coverUrl,
-                          width: 50,
-                          height: 70,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) {
-                            return Image.asset(
-                              'images/cover-error.png',
-                              width: 50,
-                              height: 70,
-                              fit: BoxFit.cover,
-                            );
-                          },
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: CachedImage(
+                            imageUrl: item.book.coverUrl,
+                            width: 50,
+                            height: 70,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                         title: Text(
                           item.book.title,

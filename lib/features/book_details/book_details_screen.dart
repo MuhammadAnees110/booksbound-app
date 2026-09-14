@@ -9,6 +9,7 @@ import 'package:booksbound_app/providers/wishlist_provider.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:booksbound_app/widgets/primary_button.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
@@ -56,13 +57,10 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 borderRadius: BorderRadius.circular(16),
                 child: Hero(
                   tag: 'book-cover-${widget.book.id}',
-                  child: Image.network(
-                    widget.book.coverUrl,
+                  child: CachedImage(
+                    imageUrl: widget.book.coverUrl,
                     height: 260,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) {
-                      return Image.asset('images/cover-error.png', height: 260);
-                    },
                   ),
                 ),
               ),
