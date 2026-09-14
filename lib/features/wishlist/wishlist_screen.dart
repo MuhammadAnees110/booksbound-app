@@ -6,6 +6,7 @@ import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/book_card_skeleton.dart';
+import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -96,8 +97,18 @@ class WishlistScreen extends StatelessWidget {
               itemBuilder: (_, __) => const BookListTileSkeleton(),
             )
           : wishlist.items.isEmpty
-          ? const Center(child: Text("Your wishlist is empty"))
-          : ListView.builder(
+              ? EmptyState(
+                  icon: Icons.favorite_border,
+                  title: "No favorites yet",
+                  subtitle: "Tap the heart on any book to save it here",
+                  actionText: "Discover Books",
+                  onAction: () {
+                    Haptics.light();
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamed(AppRoutes.categories);
+                  },
+                )
+              : ListView.builder(
               itemCount: wishlist.items.length,
               itemBuilder: (context, index) {
                 final books = booksProvider.visibleBooks

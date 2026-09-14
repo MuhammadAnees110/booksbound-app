@@ -11,6 +11,7 @@ import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/order_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:booksbound_app/widgets/skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -197,13 +198,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
-                                          return const Center(
-                                              child: CircularProgressIndicator());
+                                          return ListView.separated(
+                                            controller: scrollController,
+                                            itemCount: 4,
+                                            separatorBuilder: (_, __) =>
+                                                const SizedBox(height: 8),
+                                            itemBuilder: (_, __) =>
+                                                const Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 16.0,
+                                                  vertical: 8.0),
+                                              child: Skeleton(
+                                                width: double.infinity,
+                                                height: 50,
+                                                radius: 8,
+                                              ),
+                                            ),
+                                          );
                                         }
                                         if (!snapshot.hasData ||
                                             snapshot.data!.isEmpty) {
-                                          return const Center(
-                                              child: Text('No orders yet.'));
+                                          return const EmptyState(
+                                            icon: Icons.inventory_2_outlined,
+                                            title: "No orders yet",
+                                            subtitle:
+                                                "Your purchase history will appear here",
+                                          );
                                         }
                                         final orders = snapshot.data!;
                                         return ListView.separated(

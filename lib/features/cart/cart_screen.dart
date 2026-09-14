@@ -4,6 +4,7 @@ import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/services/connectivity_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,11 +24,16 @@ class CartScreen extends StatelessWidget {
         ),
       ),
       body: cartItems.isEmpty
-          ? const Center(
-              child: Text(
-                "Your cart is empty",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
+          ? EmptyState(
+              icon: Icons.shopping_cart_outlined,
+              title: "Your cart is empty",
+              subtitle: "Browse our catalog and add books you love",
+              actionText: "Browse Books",
+              onAction: () {
+                Haptics.light();
+                Navigator.of(context, rootNavigator: true)
+                    .pushNamed(AppRoutes.categories);
+              },
             )
           : Column(
               children: [

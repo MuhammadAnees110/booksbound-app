@@ -4,6 +4,7 @@ import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/widgets/book_card_skeleton.dart';
+import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -126,15 +127,10 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildNoResults() {
-    return Center(
-      child: Text(
-        'No books found',
-        style: TextStyle(
-          fontSize: 20,
-          color: Colors.grey.shade800,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+    return const EmptyState(
+      icon: Icons.search_off_rounded,
+      title: "No books found",
+      subtitle: "Try a different keyword or category",
     );
   }
 }

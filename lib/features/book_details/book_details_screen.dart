@@ -9,6 +9,7 @@ import 'package:booksbound_app/providers/wishlist_provider.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
 import 'package:booksbound_app/widgets/skeleton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -313,7 +314,15 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 }
 
                 if (provider.reviews.isEmpty) {
-                  return const Text("No reviews yet");
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12.0),
+                    child: EmptyState(
+                      icon: Icons.rate_review_outlined,
+                      title: "No reviews yet",
+                      subtitle:
+                          "Be the first to share your thoughts on this book!",
+                    ),
+                  );
                 }
 
                 return Column(

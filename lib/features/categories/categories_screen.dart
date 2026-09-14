@@ -1,5 +1,6 @@
 import 'package:booksbound_app/providers/category_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
+import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:booksbound_app/widgets/skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +36,13 @@ class CategoriesScreen extends StatelessWidget {
           }
 
           final categories = provider.categories;
+          if (categories.isEmpty) {
+            return const EmptyState(
+              icon: Icons.category_outlined,
+              title: "No categories available",
+              subtitle: "Check back later for new book categories",
+            );
+          }
 
           return GridView.builder(
             padding: const EdgeInsets.all(16),
