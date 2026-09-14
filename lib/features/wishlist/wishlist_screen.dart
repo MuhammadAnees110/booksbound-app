@@ -5,6 +5,7 @@ import 'package:booksbound_app/providers/wishlist_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/book_card_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -90,7 +91,10 @@ class WishlistScreen extends StatelessWidget {
         ],
       ),
       body: wishlist.isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? ListView.builder(
+              itemCount: 5,
+              itemBuilder: (_, __) => const BookListTileSkeleton(),
+            )
           : wishlist.items.isEmpty
           ? const Center(child: Text("Your wishlist is empty"))
           : ListView.builder(

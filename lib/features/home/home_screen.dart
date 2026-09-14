@@ -1,5 +1,6 @@
 import 'package:booksbound_app/providers/wishlist_provider.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/home_screen_skeleton.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
 import 'package:booksbound_app/widgets/sort_sheet.dart';
 import 'package:booksbound_app/models/book_model.dart';
@@ -32,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final bookProvider = Provider.of<BookProvider>(context);
     if (bookProvider.isloading) {
-      return const Center(child: CircularProgressIndicator());
+      return const HomeScreenSkeleton();
     }
 
     return Column(

@@ -11,6 +11,7 @@ import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/order_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -52,7 +53,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: Consumer<ProfileProvider>(
         builder: (context, provider, _) {
           if (provider.isloading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Skeleton(width: 100, height: 100, radius: 50),
+                  SizedBox(height: 16),
+                  Skeleton(width: 140, height: 20, radius: 4),
+                  SizedBox(height: 8),
+                  Skeleton(width: 180, height: 14, radius: 4),
+                  SizedBox(height: 24),
+                  Skeleton(width: double.infinity, height: 50, radius: 12),
+                  SizedBox(height: 12),
+                  Skeleton(width: double.infinity, height: 50, radius: 12),
+                  SizedBox(height: 12),
+                  Skeleton(width: double.infinity, height: 50, radius: 12),
+                ],
+              ),
+            );
           }
 
           if (provider.error.isNotEmpty) {

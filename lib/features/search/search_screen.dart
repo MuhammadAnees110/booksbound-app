@@ -3,6 +3,7 @@ import 'package:booksbound_app/providers/book_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
+import 'package:booksbound_app/widgets/book_card_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -62,10 +63,15 @@ class _SearchScreenState extends State<SearchScreen> {
 
           /// 📚 Content
           Expanded(
-            child: _query.isEmpty
-                ? _buildEmptyState()
-                : results.isEmpty
-                ? _buildNoResults()
+            child: bookProvider.isloading
+                ? ListView.builder(
+                    itemCount: 6,
+                    itemBuilder: (_, __) => const BookListTileSkeleton(),
+                  )
+                : _query.isEmpty
+                    ? _buildEmptyState()
+                    : results.isEmpty
+                        ? _buildNoResults()
                 : ListView.builder(
                     itemCount: results.length,
                     itemBuilder: (context, index) {

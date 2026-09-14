@@ -10,6 +10,7 @@ import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
+import 'package:booksbound_app/widgets/skeleton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -160,7 +161,10 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
             Consumer<RatingsProvider>(
               builder: (context, ratingsProvider, _) {
                 if (ratingsProvider.isloading) {
-                  return const CircularProgressIndicator();
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Skeleton(width: 150, height: 28, radius: 6),
+                  );
                 }
 
                 final userRating = ratingsProvider.userRating;
@@ -278,7 +282,34 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
             Consumer<ReviewsProvider>(
               builder: (context, provider, _) {
                 if (provider.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Column(
+                    children: List.generate(
+                      2,
+                      (_) => const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Skeleton(width: 40, height: 40, radius: 20),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Skeleton(width: 100, height: 14, radius: 4),
+                                  SizedBox(height: 6),
+                                  Skeleton(
+                                    width: double.infinity,
+                                    height: 12,
+                                    radius: 4,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
                 }
 
                 if (provider.reviews.isEmpty) {
