@@ -5,6 +5,7 @@ import 'package:booksbound_app/services/connectivity_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
+import 'package:booksbound_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -141,42 +142,35 @@ class CartScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          onPressed: cart.items.isEmpty
-                              ? null
-                              : () async {
-                                  final isOnline =
-                                      await ConnectivityService.isOnline();
-                                  if (!isOnline) {
-                                    if (!context.mounted) return;
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Cannot checkout while offline. Please check your connection.',
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                    return;
-                                  }
-
-                                  Haptics.light();
-                                  AnalyticsService.logBeginCheckout(
-                                    total: cart.totalAmount,
-                                    itemCount: cart.itemsCount,
-                                  );
+                      PrimaryButton(
+                        text: 'Checkout',
+                        icon: Icons.lock_outline,
+                        onPressed: cart.items.isEmpty
+                            ? null
+                            : () async {
+                                final isOnline =
+                                    await ConnectivityService.isOnline();
+                                if (!isOnline) {
                                   if (!context.mounted) return;
-                                  Navigator.of(context, rootNavigator: true)
-                                      .pushNamed(AppRoutes.checkout);
-                                },
-                          child: const Text(
-                            'Checkout',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Cannot checkout while offline. Please check your connection.',
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                AnalyticsService.logBeginCheckout(
+                                  total: cart.totalAmount,
+                                  itemCount: cart.itemsCount,
+                                );
+                                if (!context.mounted) return;
+                                Navigator.of(context, rootNavigator: true)
+                                    .pushNamed(AppRoutes.checkout);
+                              },
                       ),
                     ],
                   ),

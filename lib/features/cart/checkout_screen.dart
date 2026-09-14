@@ -7,6 +7,7 @@ import 'package:booksbound_app/models/order_model.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/utils/validators.dart';
+import 'package:booksbound_app/widgets/primary_button.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -100,14 +101,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     Validators.validateRequired(val, 'Shipping Address'),
               ),
               const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _processCheckout,
-                  child: _isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Place Order'),
-                ),
+              PrimaryButton(
+                text: 'Place Order',
+                icon: Icons.check_circle_outline,
+                isLoading: _isLoading,
+                onPressed: _processCheckout,
               ),
             ],
           ),

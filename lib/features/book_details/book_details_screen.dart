@@ -10,6 +10,7 @@ import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
+import 'package:booksbound_app/widgets/primary_button.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
 import 'package:booksbound_app/widgets/skeleton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -374,28 +375,16 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
             const SizedBox(height: 32),
 
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  Haptics.medium();
-                  context.read<CartProvider>().addToCart(widget.book);
+            PrimaryButton(
+              text: 'Add to Cart',
+              icon: Icons.shopping_bag_outlined,
+              onPressed: () {
+                context.read<CartProvider>().addToCart(widget.book);
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Added to Cart")),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: const Text(
-                  'Add to Cart',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Added to Cart")),
+                );
+              },
             ),
           ],
         ),
