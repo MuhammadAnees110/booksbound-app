@@ -1,6 +1,7 @@
 import 'package:booksbound_app/providers/ratings_provider.dart';
 import 'package:booksbound_app/providers/reviews_provider.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -41,41 +42,40 @@ class _WriteReviewSheetState extends State<WriteReviewSheet> {
 
     setState(() => _isSubmitting = true);
 
-    try {
-      await context.read<ReviewsProvider>().addReview(
-            bookId: widget.bookId,
-            comment: comment,
-          );
+    final reviewResult = await context.read<ReviewsProvider>().addReview(
+          bookId: widget.bookId,
+          comment: comment,
+        );
 
+    if (!reviewResult.isSuccess) {
       if (mounted) {
-        await context.read<RatingsProvider>().rateBook(
-              widget.bookId,
-              _selectedRating.toDouble(),
-            );
-      }
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Review submitted successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Navigator.pop(context);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to submit review: '),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    } finally {
-      if (mounted) {
+        ErrorPresenter.show(context, reviewResult);
         setState(() => _isSubmitting = false);
       }
+      return;
     }
+
+    if (mounted) {
+      final ratingResult = await context.read<RatingsProvider>().rateBook(
+            widget.bookId,
+            _selectedRating.toDouble(),
+          );
+      if (!mounted) return;
+      if (!ratingResult.isSuccess) {
+        ErrorPresenter.show(context, ratingResult);
+      }
+    }
+
+    if (!mounted) return;
+
+    setState(() => _isSubmitting = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Review submitted successfully!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+    Navigator.pop(context);
   }
 
   @override

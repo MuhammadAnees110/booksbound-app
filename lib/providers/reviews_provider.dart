@@ -1,10 +1,12 @@
 import 'package:booksbound_app/constants/app_constants.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:booksbound_app/models/review_model.dart';
+import 'package:booksbound_app/services/reviews_service.dart';
 import 'package:booksbound_app/services/user_service.dart';
+import 'package:booksbound_app/utils/error_mapper.dart';
+import 'package:booksbound_app/utils/result.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../models/review_model.dart';
-import '../services/reviews_service.dart';
 
 class ReviewsProvider extends ChangeNotifier {
   final ReviewsService _reviewsService = ReviewsService();
@@ -27,27 +29,28 @@ class ReviewsProvider extends ChangeNotifier {
     _error = '';
     notifyListeners();
 
-    try {
-      _reviews = await _reviewsService.getReviews(bookId);
+    final result = await _reviewsService.getReviews(bookId);
+    if (result.isSuccess) {
+      _reviews = result.data ?? [];
       final userIds = _reviews.map((r) => r.userId).toSet().toList();
 
       // Parallel batch fetching for avatars to resolve N+1 latency
       final avatarFutures = userIds.map((id) async {
-        final avatar = await _userService.getUserAvatar(id);
-        return MapEntry(id, avatar);
+        final avatarResult = await _userService.getUserAvatar(id);
+        return MapEntry(id, avatarResult.data ?? '');
       });
 
       final avatarEntries = await Future.wait(avatarFutures);
       _userAvatars = Map.fromEntries(avatarEntries);
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+      _error = '';
+    } else {
+      _error = result.message;
     }
+    _isLoading = false;
+    notifyListeners();
   }
 
-  Future<void> addReview({
+  Future<Result<void>> addReview({
     required String bookId,
     required String comment,
   }) async {
@@ -55,7 +58,7 @@ class ReviewsProvider extends ChangeNotifier {
     if (user == null) {
       _error = "User not authenticated";
       notifyListeners();
-      return;
+      return Result.error(ResultStatus.unauthorized, "User not authenticated");
     }
 
     _isLoading = true;
@@ -69,7 +72,14 @@ class ReviewsProvider extends ChangeNotifier {
           .get();
 
       final data = snapshot.data();
-      if (data == null) throw Exception("User data not found");
+      if (data == null) {
+        final res =
+            Result<void>.error(ResultStatus.notFound, "User data not found");
+        _error = res.message;
+        _isLoading = false;
+        notifyListeners();
+        return res;
+      }
 
       final review = ReviewModel(
         userId: user.uid,
@@ -79,25 +89,39 @@ class ReviewsProvider extends ChangeNotifier {
         likedBy: [],
       );
 
-      await _reviewsService.addReview(bookId: bookId, review: review);
-      _reviews.insert(0, review);
-    } catch (e) {
-      _error = e.toString();
-    } finally {
+      final result =
+          await _reviewsService.addReview(bookId: bookId, review: review);
+      if (result.isSuccess) {
+        _reviews.insert(0, review);
+        _error = '';
+      } else {
+        _error = result.message;
+      }
       _isLoading = false;
       notifyListeners();
+      return result;
+    } catch (e) {
+      final res = ErrorMapper.fromGeneric<void>(e);
+      _error = res.message;
+      _isLoading = false;
+      notifyListeners();
+      return res;
     }
   }
 
-  Future<void> toggleLike({
+  Future<Result<void>> toggleLike({
     required String bookId,
     required ReviewModel review,
   }) async {
     final user = currentUser;
-    if (user == null) return;
+    if (user == null) {
+      return Result.error(ResultStatus.unauthorized, 'User not authenticated');
+    }
 
     final index = _reviews.indexOf(review);
-    if (index == -1) return;
+    if (index == -1) {
+      return Result.error(ResultStatus.notFound, 'Review not found');
+    }
 
     final likedBy = List<String>.from(review.likedBy);
     likedBy.contains(user.uid)
@@ -113,7 +137,14 @@ class ReviewsProvider extends ChangeNotifier {
     );
 
     notifyListeners();
-    await _reviewsService.toggleLike(bookId: bookId, review: review);
+    final result =
+        await _reviewsService.toggleLike(bookId: bookId, review: review);
+    if (!result.isSuccess) {
+      _error = result.message;
+      _reviews[index] = review;
+      notifyListeners();
+    }
+    return result;
   }
 
   bool isLikedBy(ReviewModel review) {
@@ -122,18 +153,24 @@ class ReviewsProvider extends ChangeNotifier {
     return review.isLikedBy(user.uid);
   }
 
-  Future<void> deleteReview({
+  Future<Result<void>> deleteReview({
     required String bookId,
     required Map<String, dynamic> review,
   }) async {
-    try {
-      await _reviewsService.deleteReview(bookId: bookId, review: review);
+    _isLoading = true;
+    notifyListeners();
+
+    final result =
+        await _reviewsService.deleteReview(bookId: bookId, review: review);
+    if (result.isSuccess) {
       _reviews.removeWhere((r) => r.userId == review['userId']);
-      notifyListeners();
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
+      _error = '';
+    } else {
+      _error = result.message;
     }
+    _isLoading = false;
+    notifyListeners();
+    return result;
   }
 
   void clear() {

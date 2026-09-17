@@ -1,11 +1,12 @@
 import 'dart:convert';
 
 import 'package:booksbound_app/constants/app_constants.dart';
+import 'package:booksbound_app/utils/error_mapper.dart';
+import 'package:booksbound_app/utils/result.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileService {
@@ -13,67 +14,121 @@ class ProfileService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ImagePicker _picker = ImagePicker();
 
-  Future<Map<String, dynamic>?> getUserData() async {
-    final currentUser = user;
-    if (currentUser == null) return null;
+  Future<Result<Map<String, dynamic>?>> getUserData() async {
+    try {
+      final currentUser = user;
+      if (currentUser == null) {
+        return Result.error(ResultStatus.unauthorized, 'No user logged in');
+      }
 
-    final doc = await _firestore.collection(AppConstants.usersCollection).doc(currentUser.uid).get();
-    return doc.data();
+      final doc = await _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(currentUser.uid)
+          .get();
+      return Result.success(doc.data());
+    } on FirebaseAuthException catch (e) {
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
+    } catch (e) {
+      return ErrorMapper.fromGeneric(e);
+    }
   }
 
-  Future<void> changeProfilePicture() async {
+  Future<Result<void>> changeProfilePicture() async {
     final currentUser = user;
-    if (currentUser == null) return;
-
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image == null) return;
+    if (currentUser == null) {
+      return Result.error(ResultStatus.unauthorized, 'No user logged in');
+    }
 
     try {
+      final XFile? image =
+          await _picker.pickImage(source: ImageSource.gallery);
+      if (image == null) return Result.noContent('No image selected');
+
       final bytes = await image.readAsBytes();
       final base64Image = base64Encode(bytes);
 
-      await _firestore.collection(AppConstants.usersCollection).doc(currentUser.uid).update({
+      await _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(currentUser.uid)
+          .update({
         'photoUrl': base64Image,
       });
+      return Result.success(null);
+    } on FirebaseAuthException catch (e) {
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
     } catch (e) {
-      rethrow;
+      return ErrorMapper.fromGeneric(e);
     }
   }
 
-  Future<void> saveProfile(String name, String? photoUrl) async {
+  Future<Result<void>> saveProfile(String name, String? photoUrl) async {
     final currentUser = user;
-    if (currentUser == null) return;
+    if (currentUser == null) {
+      return Result.error(ResultStatus.unauthorized, 'No user logged in');
+    }
 
     try {
-      await _firestore.collection(AppConstants.usersCollection).doc(currentUser.uid).update({
+      await _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(currentUser.uid)
+          .update({
         'name': name,
         'photoUrl': photoUrl,
       });
+      return Result.success(null);
+    } on FirebaseAuthException catch (e) {
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
     } catch (e) {
-      rethrow;
+      return ErrorMapper.fromGeneric(e);
     }
   }
 
-  Future<String> getUserAvatar(String userId) async {
+  Future<Result<String>> getUserAvatar(String userId) async {
     try {
-      final doc = await _firestore.collection(AppConstants.usersCollection).doc(userId).get();
+      final doc = await _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(userId)
+          .get();
       if (doc.exists) {
-        return doc.data()?['photoUrl'] ?? '';
+        return Result.success(doc.data()?['photoUrl'] ?? '');
       }
+      return Result.success('');
+    } on FirebaseAuthException catch (e) {
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
     } catch (e) {
-      debugPrint("Failed to fetch user avatar: $e");
+      return ErrorMapper.fromGeneric(e);
     }
-    return '';
   }
 
-  Future<String> getUserRole(String uid) async {
-    final doc = await _firestore.collection(AppConstants.usersCollection).doc(uid).get();
-    return doc.data()?['role'] ?? 'user';
+  Future<Result<String>> getUserRole(String uid) async {
+    try {
+      final doc = await _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(uid)
+          .get();
+      return Result.success(doc.data()?['role'] ?? 'user');
+    } on FirebaseAuthException catch (e) {
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
+    } catch (e) {
+      return ErrorMapper.fromGeneric(e);
+    }
   }
 
-  Future<void> deleteAccount() async {
+  Future<Result<void>> deleteAccount() async {
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) throw Exception('No user logged in');
+    if (currentUser == null) {
+      return Result.error(ResultStatus.unauthorized, 'No user logged in');
+    }
 
     try {
       // 1. Delete user's cart items
@@ -130,7 +185,10 @@ class ProfileService {
       }
 
       // 6. Delete user document from Firestore
-      await _firestore.collection(AppConstants.usersCollection).doc(currentUser.uid).delete();
+      await _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(currentUser.uid)
+          .delete();
       if (AppConstants.usersCollection != 'users') {
         try {
           await _firestore.collection('users').doc(currentUser.uid).delete();
@@ -144,15 +202,20 @@ class ProfileService {
 
       // 8. Log analytics event
       await FirebaseAnalytics.instance.logEvent(name: 'account_deleted');
+      return Result.success(null);
+    } on FirebaseAuthException catch (e) {
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
     } catch (e) {
-      throw Exception('Failed to delete account: $e');
+      return ErrorMapper.fromGeneric(e);
     }
   }
 }
 
 class UserService {
-  static Future<void> deleteAccount() async {
+  static Future<Result<void>> deleteAccount() async {
     final service = ProfileService();
-    await service.deleteAccount();
+    return await service.deleteAccount();
   }
 }

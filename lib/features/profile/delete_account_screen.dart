@@ -1,6 +1,7 @@
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/user_service.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:flutter/material.dart';
 
 class DeleteAccountScreen extends StatefulWidget {
@@ -28,22 +29,15 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     Haptics.warning();
     setState(() => _isLoading = true);
 
-    try {
-      await ProfileService().deleteAccount();
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true)
-          .pushNamedAndRemoveUntil(appRoutes.login, (_) => false);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to delete account: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+    final result = await ProfileService().deleteAccount();
+    if (!mounted) return;
+    if (!result.isSuccess) {
+      ErrorPresenter.show(context, result);
+      setState(() => _isLoading = false);
+      return;
     }
+    Navigator.of(context, rootNavigator: true)
+        .pushNamedAndRemoveUntil(appRoutes.login, (_) => false);
   }
 
   @override

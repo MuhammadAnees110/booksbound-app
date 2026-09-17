@@ -1,6 +1,7 @@
 import 'package:booksbound_app/models/user_model.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/utils/validators.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:booksbound_app/providers/user_auth_provider.dart';
@@ -165,27 +166,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     role: "user",
                                   );
 
-                                  await provider.registerUser(data);
+                                  final result = await provider.registerUser(data);
 
                                   if (!context.mounted) return;
 
-                                  if (provider.error.isNotEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(provider.error)),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          "Registration successful",
-                                        ),
-                                      ),
-                                    );
-                                    Navigator.pushNamed(
-                                      context,
-                                      appRoutes.main,
-                                    );
+                                  if (!result.isSuccess) {
+                                    ErrorPresenter.show(context, result);
+                                    return;
                                   }
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Registration successful",
+                                      ),
+                                    ),
+                                  );
+                                  Navigator.pushNamed(
+                                    context,
+                                    appRoutes.main,
+                                  );
                                 },
                           child: provider.isloading
                               ? const CircularProgressIndicator()

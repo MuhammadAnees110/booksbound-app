@@ -1,4 +1,5 @@
 import 'package:booksbound_app/services/user_service.dart';
+import 'package:booksbound_app/utils/result.dart';
 import 'package:flutter/material.dart';
 
 class ProfileProvider extends ChangeNotifier {
@@ -16,54 +17,62 @@ class ProfileProvider extends ChangeNotifier {
   bool get isAdmin => _role == "admin";
 
   Future<void> loadRole(String uid) async {
-    _role = await _profileService.getUserRole(uid);
-    notifyListeners();
-  }
-
-  Future<void> getUserData() async {
-    _isloading = true;
-    _error = "";
-    notifyListeners();
-
-    try {
-      _userData = await _profileService.getUserData();
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isloading = false;
-      notifyListeners();
+    final result = await _profileService.getUserRole(uid);
+    if (result.isSuccess) {
+      _role = result.data ?? 'user';
     }
+    notifyListeners();
   }
 
-  Future<void> changeProfilePicture() async {
+  Future<Result<Map<String, dynamic>?>> getUserData() async {
     _isloading = true;
     _error = "";
     notifyListeners();
 
-    try {
-      await _profileService.changeProfilePicture();
+    final result = await _profileService.getUserData();
+    if (result.isSuccess) {
+      _userData = result.data;
+      _error = "";
+    } else {
+      _error = result.message;
+    }
+    _isloading = false;
+    notifyListeners();
+    return result;
+  }
+
+  Future<Result<void>> changeProfilePicture() async {
+    _isloading = true;
+    _error = "";
+    notifyListeners();
+
+    final result = await _profileService.changeProfilePicture();
+    if (result.isSuccess) {
       await getUserData();
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isloading = false;
-      notifyListeners();
+      _error = "";
+    } else {
+      _error = result.message;
     }
+    _isloading = false;
+    notifyListeners();
+    return result;
   }
 
-  Future<void> saveProfile(String name, String? photoUrl) async {
+  Future<Result<void>> saveProfile(String name, String? photoUrl) async {
     _isloading = true;
     _error = "";
     notifyListeners();
 
-    try {
-      await _profileService.saveProfile(name, photoUrl);
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isloading = false;
-      notifyListeners();
+    final result = await _profileService.saveProfile(name, photoUrl);
+    if (result.isSuccess) {
+      await getUserData();
+      _error = "";
+    } else {
+      _error = result.message;
     }
+    _isloading = false;
+    notifyListeners();
+    return result;
   }
 
   void clear() {

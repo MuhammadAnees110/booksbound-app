@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:booksbound_app/features/admin/manage_users/providers/admin_users_provider.dart';
 import 'package:booksbound_app/models/user_model.dart';
+import 'package:booksbound_app/utils/result.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -68,19 +70,34 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [Text(user.email), Text('Role: ${user.role}')],
         ),
-        trailing: PopupMenuButton(
+        trailing: PopupMenuButton<String>(
+          onSelected: (value) async {
+            Result result;
+            if (value == 'block') {
+              result = await provider.toggleBlock(user);
+            } else if (value == 'makeAdmin') {
+              result = await provider.makeAdmin(user);
+            } else if (value == 'makeUser') {
+              result = await provider.makeUser(user);
+            } else {
+              return;
+            }
+            if (!result.isSuccess && context.mounted) {
+              ErrorPresenter.show(context, result);
+            }
+          },
           itemBuilder: (_) => [
             PopupMenuItem(
+              value: 'block',
               child: Text(user.isBlocked ? 'Unblock' : 'Block'),
-              onTap: () => provider.toggleBlock(user),
             ),
-            PopupMenuItem(
-              child: const Text('Make Admin'),
-              onTap: () => provider.makeAdmin(user),
+            const PopupMenuItem(
+              value: 'makeAdmin',
+              child: Text('Make Admin'),
             ),
-            PopupMenuItem(
-              child: const Text('Make User'),
-              onTap: () => provider.makeUser(user),
+            const PopupMenuItem(
+              value: 'makeUser',
+              child: Text('Make User'),
             ),
           ],
         ),

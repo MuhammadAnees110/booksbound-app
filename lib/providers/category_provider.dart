@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:booksbound_app/models/category_model.dart';
 import 'package:booksbound_app/services/category_service.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +25,15 @@ class CategoryProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _categoryService.seedDefaultCategories().catchError((_) {});
+      unawaited(_categoryService.seedDefaultCategories());
 
-      _categoryService.getCategories().listen((cats) {
-        _categories = cats;
+      _categoryService.getCategories().listen((result) {
+        if (result.isSuccess) {
+          _categories = result.data ?? [];
+          _error = '';
+        } else {
+          _error = result.message;
+        }
         _isLoading = false;
         notifyListeners();
       }, onError: (e) {

@@ -1,4 +1,5 @@
 import 'package:booksbound_app/services/ratings_service.dart';
+import 'package:booksbound_app/utils/result.dart';
 import 'package:flutter/material.dart';
 
 class RatingsProvider extends ChangeNotifier {
@@ -16,34 +17,36 @@ class RatingsProvider extends ChangeNotifier {
     _error = "";
     notifyListeners();
 
-    try {
-      _userRating = await _ratingsService.getUserRating(bookId);
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isloading = false;
-      notifyListeners();
+    final result = await _ratingsService.getUserRating(bookId);
+    if (result.isSuccess) {
+      _userRating = result.data ?? 0;
+      _error = "";
+    } else {
+      _error = result.message;
     }
+    _isloading = false;
+    notifyListeners();
   }
 
   bool hasRated(String bookId) {
     return _ratingsService.hasRated(bookId);
   }
 
-  Future<void> rateBook(String bookId, double rating) async {
+  Future<Result<void>> rateBook(String bookId, double rating) async {
     _isloading = true;
     _error = "";
     notifyListeners();
 
-    try {
-      await _ratingsService.rateBook(bookId, rating);
+    final result = await _ratingsService.rateBook(bookId, rating);
+    if (result.isSuccess) {
       _userRating = rating;
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isloading = false;
-      notifyListeners();
+      _error = "";
+    } else {
+      _error = result.message;
     }
+    _isloading = false;
+    notifyListeners();
+    return result;
   }
 
   Future<void> loadUserRatings() async {
@@ -51,14 +54,14 @@ class RatingsProvider extends ChangeNotifier {
     _error = "";
     notifyListeners();
 
-    try {
-      await _ratingsService.loadUserRatings();
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isloading = false;
-      notifyListeners();
+    final result = await _ratingsService.loadUserRatings();
+    if (result.isSuccess) {
+      _error = "";
+    } else {
+      _error = result.message;
     }
+    _isloading = false;
+    notifyListeners();
   }
 
   void clear() {

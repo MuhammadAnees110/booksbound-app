@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/services/books_service.dart';
+import 'package:booksbound_app/utils/result.dart';
 import 'package:flutter/material.dart';
 
 enum SortType { priceLow, priceHigh, newest, popularity }
@@ -11,7 +12,6 @@ class BookProvider extends ChangeNotifier {
   bool _isloading = false;
   String _error = "";
   List<Book> _books = [];
-  // List<Book> _visibleBooks = [];
   List<Book> _filteredBooks = [];
   String _searchQuery = "";
   List<Book> get visibleBooks => _filteredBooks;
@@ -21,7 +21,7 @@ class BookProvider extends ChangeNotifier {
   List<Book> get newArrivals => _books
       .where(
         (b) =>
-            b.releaseDate.isAfter(DateTime.now().subtract(Duration(days: 365))),
+            b.releaseDate.isAfter(DateTime.now().subtract(const Duration(days: 365))),
       )
       .toList();
 
@@ -29,15 +29,17 @@ class BookProvider extends ChangeNotifier {
     _isloading = true;
     _error = "";
     notifyListeners();
-    try {
-      _books = await _service.fetchBooks();
+
+    final result = await _service.fetchBooks();
+    if (result.isSuccess) {
+      _books = result.data ?? [];
       _filteredBooks = List.from(_books);
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isloading = false;
-      notifyListeners();
+      _error = "";
+    } else {
+      _error = result.message;
     }
+    _isloading = false;
+    notifyListeners();
   }
 
   List<Book> search(String query) {
@@ -73,76 +75,75 @@ class BookProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> deleteBook(String bookId) async {
+  Future<Result<void>> deleteBook(String bookId) async {
     _isloading = true;
     _error = '';
     notifyListeners();
 
-    try {
-      await _service.deleteBook(bookId);
+    final result = await _service.deleteBook(bookId);
+    if (result.isSuccess) {
       _books.removeWhere((book) => book.id == bookId);
       _applySearch();
-      return true;
-    } catch (e) {
-      _error = 'Failed to delete book: $e';
-      return false;
-    } finally {
-      _isloading = false;
-      notifyListeners();
+    } else {
+      _error = result.message;
     }
+    _isloading = false;
+    notifyListeners();
+    return result;
   }
 
-  Future<Book?> getBookById(String bookId) async {
-    try {
-      return await _service.getBookById(bookId);
-    } catch (e) {
-      _error = 'Failed to load book: $e';
-      notifyListeners();
-      return null;
-    }
-  }
-
-  Future<bool> addBook(Book book, {File? imageFile}) async {
+  Future<Result<Book>> getBookById(String bookId) async {
     _isloading = true;
     _error = '';
     notifyListeners();
 
-    try {
-      final bookId = await _service.addBook(book, imageFile: imageFile);
-      book.id = bookId;
+    final result = await _service.getBookById(bookId);
+    if (result.isSuccess) {
+      _error = '';
+    } else {
+      _error = result.message;
+    }
+    _isloading = false;
+    notifyListeners();
+    return result;
+  }
+
+  Future<Result<String>> addBook(Book book, {File? imageFile}) async {
+    _isloading = true;
+    _error = '';
+    notifyListeners();
+
+    final result = await _service.addBook(book, imageFile: imageFile);
+    if (result.isSuccess) {
+      book.id = result.data ?? book.id;
       _books.add(book);
       _applySearch();
-      return true;
-    } catch (e) {
-      _error = 'Failed to add book: $e';
-      return false;
-    } finally {
-      _isloading = false;
-      notifyListeners();
+    } else {
+      _error = result.message;
     }
+    _isloading = false;
+    notifyListeners();
+    return result;
   }
 
-  Future<bool> updateBook(String bookId, Book book, {File? imageFile}) async {
+  Future<Result<void>> updateBook(String bookId, Book book, {File? imageFile}) async {
     _isloading = true;
     _error = '';
     notifyListeners();
 
-    try {
-      await _service.updateBook(bookId, book, imageFile: imageFile);
-
+    final result = await _service.updateBook(bookId, book, imageFile: imageFile);
+    if (result.isSuccess) {
       final index = _books.indexWhere((b) => b.id == bookId);
       if (index != -1) {
         _books[index] = book;
         _applySearch();
       }
-      return true;
-    } catch (e) {
-      _error = 'Failed to update book: $e';
-      return false;
-    } finally {
-      _isloading = false;
-      notifyListeners();
+    } else {
+      _error = result.message;
     }
+    _isloading = false;
+    notifyListeners();
+    return result;
   }
 
   Future<void> searchBooks(String query) async {
@@ -154,33 +155,38 @@ class BookProvider extends ChangeNotifier {
       _isloading = true;
       notifyListeners();
 
-      try {
-        _filteredBooks = await _service.searchBooks(_searchQuery);
-      } catch (e) {
-        _error = 'Search failed: $e';
+      final result = await _service.searchBooks(_searchQuery);
+      if (result.isSuccess) {
+        _filteredBooks = result.data ?? [];
+        _error = '';
+      } else {
+        _error = result.message;
         _filteredBooks = [];
-      } finally {
-        _isloading = false;
-        notifyListeners();
       }
+      _isloading = false;
+      notifyListeners();
     }
     notifyListeners();
   }
 
   Future<List<Book>> getBooksByGenre(String genre) async {
-    try {
-      return await _service.getBooksByGenre(genre);
-    } catch (e) {
-      _error = 'Failed to get books by genre: $e';
+    final result = await _service.getBooksByGenre(genre);
+    if (result.isSuccess) {
+      return result.data ?? [];
+    } else {
+      _error = result.message;
+      notifyListeners();
       return [];
     }
   }
 
   Future<List<Book>> getBestsellers() async {
-    try {
-      return await _service.getBestsellers();
-    } catch (e) {
-      _error = 'Failed to get bestsellers: $e';
+    final result = await _service.getBestsellers();
+    if (result.isSuccess) {
+      return result.data ?? [];
+    } else {
+      _error = result.message;
+      notifyListeners();
       return [];
     }
   }

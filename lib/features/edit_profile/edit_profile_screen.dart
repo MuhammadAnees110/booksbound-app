@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:booksbound_app/providers/user_provider.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -126,12 +127,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             final messenger = ScaffoldMessenger.of(context);
                             final navigator = Navigator.of(context);
 
-                            await profileProvider.saveProfile(
+                            final result = await profileProvider.saveProfile(
                               _nameController.text.trim(),
                               userData["photoUrl"],
                             );
 
-                            if (!mounted) return;
+                            if (!context.mounted) return;
+
+                            if (!result.isSuccess) {
+                              ErrorPresenter.show(context, result);
+                              return;
+                            }
 
                             messenger.showSnackBar(
                               const SnackBar(

@@ -11,7 +11,9 @@ import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/order_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/utils/result.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:booksbound_app/widgets/skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -106,7 +108,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         label: 'Change profile picture',
                         button: true,
                         child: GestureDetector(
-                          onTap: provider.changeProfilePicture,
+                          onTap: () async {
+                            final result =
+                                await provider.changeProfilePicture();
+                            if (!result.isSuccess && context.mounted) {
+                              ErrorPresenter.show(context, result);
+                            }
+                          },
                           child: Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
@@ -197,7 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                   Expanded(
-                                    child: StreamBuilder<List<OrderModel>>(
+                                    child: StreamBuilder<Result<List<OrderModel>>>(
                                       stream: OrderService().getUserOrders(uid),
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState ==
@@ -220,8 +228,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             ),
                                           );
                                         }
-                                        if (!snapshot.hasData ||
-                                            snapshot.data!.isEmpty) {
+                                        final result = snapshot.data;
+                                        if (result == null ||
+                                            !result.isSuccess ||
+                                            result.data!.isEmpty) {
                                           return const EmptyState(
                                             icon: Icons.inventory_2_outlined,
                                             title: "No orders yet",
@@ -229,7 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 "Your purchase history will appear here",
                                           );
                                         }
-                                        final orders = snapshot.data!;
+                                        final orders = result.data!;
                                         return ListView.separated(
                                           controller: scrollController,
                                           itemCount: orders.length,

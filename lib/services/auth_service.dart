@@ -1,6 +1,8 @@
 import 'package:booksbound_app/constants/app_constants.dart';
 import 'package:booksbound_app/models/user_model.dart';
 import 'package:booksbound_app/services/analytics_service.dart';
+import 'package:booksbound_app/utils/error_mapper.dart';
+import 'package:booksbound_app/utils/result.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -8,7 +10,7 @@ class AuthService {
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
-  Future<void> register(UserModel data) async {
+  Future<Result<void>> register(UserModel data) async {
     try {
       await firebaseAuth.createUserWithEmailAndPassword(
         email: data.email,
@@ -19,79 +21,98 @@ class AuthService {
           .doc(firebaseAuth.currentUser?.uid)
           .set(data.copyWith(uid: firebaseAuth.currentUser!.uid).toJson());
       await AnalyticsService.logSignUp();
+      return Result.success(null);
     } on FirebaseAuthException catch (e) {
-      throw e.toString();
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
+    } catch (e) {
+      return ErrorMapper.fromGeneric(e);
     }
   }
 
-  Future<void> signUp(UserModel data) => register(data);
+  Future<Result<void>> signUp(UserModel data) => register(data);
 
-  Future<User?> login({required String email, required String password}) async {
+  Future<Result<User?>> login({
+    required String email,
+    required String password,
+  }) async {
     try {
       final UserCredential credential = await firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
       await AnalyticsService.logLogin('email');
-      return credential.user;
+      return Result.success(credential.user);
     } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'user-not-found':
-          throw 'No user found with this email';
-        case 'wrong-password':
-          throw 'Incorrect Password';
-        default:
-          throw e.message ?? "Authentication Failed";
-      }
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
+    } catch (e) {
+      return ErrorMapper.fromGeneric(e);
     }
   }
 
-  Future<void> logout() async {
+  Future<Result<void>> logout() async {
     try {
       await firebaseAuth.signOut();
+      return Result.success(null);
     } on FirebaseAuthException catch (e) {
-      throw e.toString();
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
+    } catch (e) {
+      return ErrorMapper.fromGeneric(e);
     }
   }
 
-  Future<bool> isLoggedIn() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    return firebaseAuth.currentUser != null;
+  Future<Result<bool>> isLoggedIn() async {
+    try {
+      await Future.delayed(const Duration(milliseconds: 300));
+      return Result.success(firebaseAuth.currentUser != null);
+    } catch (e) {
+      return ErrorMapper.fromGeneric(e);
+    }
   }
 
-  Future<void> changePassword({
+  Future<Result<void>> changePassword({
     required String currentPassword,
     required String newPassword,
   }) async {
-    if (firebaseAuth.currentUser == null ||
-        firebaseAuth.currentUser!.email == null) {
-      throw Exception("User not authenticated");
+    try {
+      if (firebaseAuth.currentUser == null ||
+          firebaseAuth.currentUser!.email == null) {
+        return Result.error(ResultStatus.unauthorized, "User not authenticated");
+      }
+
+      final credential = EmailAuthProvider.credential(
+        email: firebaseAuth.currentUser!.email!,
+        password: currentPassword,
+      );
+
+      // Re-authenticate
+      await firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
+
+      // Update password
+      await firebaseAuth.currentUser!.updatePassword(newPassword);
+      return Result.success(null);
+    } on FirebaseAuthException catch (e) {
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
+    } catch (e) {
+      return ErrorMapper.fromGeneric(e);
     }
-
-    final credential = EmailAuthProvider.credential(
-      email: firebaseAuth.currentUser!.email!,
-      password: currentPassword,
-    );
-
-    // Re-authenticate
-    await firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
-
-    // Update password
-    await firebaseAuth.currentUser!.updatePassword(newPassword);
   }
 
-  Future<void> sendPasswordResetEmail(String email) async {
+  Future<Result<void>> sendPasswordResetEmail(String email) async {
     try {
       await firebaseAuth.sendPasswordResetEmail(email: email.trim());
+      return Result.success(null);
     } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'user-not-found':
-          throw 'No user found with this email';
-        case 'invalid-email':
-          throw 'Invalid email address format';
-        default:
-          throw e.message ?? 'Failed to send password reset email';
-      }
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
     } catch (e) {
-      throw e.toString();
+      return ErrorMapper.fromGeneric(e);
     }
   }
 }

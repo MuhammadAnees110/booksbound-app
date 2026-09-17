@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:booksbound_app/models/order_model.dart';
 import 'package:booksbound_app/services/order_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
+import 'package:booksbound_app/utils/result.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 
 class ManageOrdersScreen extends StatelessWidget {
   const ManageOrdersScreen({super.key});
@@ -38,7 +40,7 @@ class ManageOrdersScreen extends StatelessWidget {
         title: const Text('Manage Orders'),
         centerTitle: true,
       ),
-      body: StreamBuilder<List<OrderModel>>(
+      body: StreamBuilder<Result<List<OrderModel>>>(
         stream: orderService.getAllOrders(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -46,10 +48,15 @@ class ManageOrdersScreen extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Error: '));
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          final orders = snapshot.data ?? [];
+          final result = snapshot.data;
+          if (result != null && !result.isSuccess) {
+            return Center(child: Text(result.message));
+          }
+
+          final orders = result?.data ?? [];
 
           if (orders.isEmpty) {
             return const Center(
@@ -86,11 +93,11 @@ class ManageOrdersScreen extends StatelessWidget {
                     child: Icon(Icons.receipt_long, color: statusColor),
                   ),
                   title: Text(
-                    'Order #',
+                    'Order #${order.id.length > 6 ? order.id.substring(0, 6) : order.id}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    ' • ',
+                    '${Formatters.formatDate(order.createdAt)} • ${Formatters.formatCurrency(order.totalAmount)}',
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                   ),
                   trailing: DropdownButton<String>(
@@ -112,15 +119,20 @@ class ManageOrdersScreen extends StatelessWidget {
                         ),
                       );
                     }).toList(),
-                    onChanged: (newStatus) {
+                    onChanged: (newStatus) async {
                       if (newStatus != null && newStatus != order.status) {
-                        orderService.updateOrderStatus(order.id, newStatus);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Order status updated to '),
-                            duration: const Duration(seconds: 1),
-                          ),
-                        );
+                        final res = await orderService.updateOrderStatus(order.id, newStatus);
+                        if (!context.mounted) return;
+                        if (res.isSuccess) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Order status updated to $newStatus'),
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                        } else {
+                          ErrorPresenter.show(context, res);
+                        }
                       }
                     },
                   ),
@@ -164,7 +176,7 @@ class ManageOrdersScreen extends StatelessWidget {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        ' (x)',
+                                        '${item.book.title} (x${item.quantity})',
                                         style: const TextStyle(fontSize: 13),
                                         overflow: TextOverflow.ellipsis,
                                       ),

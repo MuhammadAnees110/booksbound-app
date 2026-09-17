@@ -18,13 +18,13 @@ class _SplashScreenState extends State<SplashScreen> {
   final AuthService _authService = AuthService();
 
   Future<void> _checkAuth() async {
-    final isLoggedIn = await _authService.isLoggedIn();
+    final result = await _authService.isLoggedIn();
     await Future.delayed(const Duration(milliseconds: 2500));
 
     if (!mounted) return;
 
     final targetPage =
-        isLoggedIn ? const MainLayout() : const LoginScreen();
+        (result.isSuccess && (result.data ?? false)) ? const MainLayout() : const LoginScreen();
     Navigator.pushReplacement(
       context,
       FadeRoute(page: targetPage),

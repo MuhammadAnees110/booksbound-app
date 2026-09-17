@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/reviews_provider.dart';
@@ -63,10 +64,13 @@ class _ReviewsAdminScreenState extends State<ReviewsAdminScreen> {
                       icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () async {
                         final reviewsProvider = context.read<ReviewsProvider>();
-                        await reviewsProvider.deleteReview(
+                        final result = await reviewsProvider.deleteReview(
                           bookId: widget.bookId,
                           review: review.toMap(),
                         );
+                        if (!result.isSuccess && context.mounted) {
+                          ErrorPresenter.show(context, result);
+                        }
                       },
                     ),
                   ),

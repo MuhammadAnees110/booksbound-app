@@ -4,8 +4,10 @@ import 'package:booksbound_app/services/analytics_service.dart';
 import 'package:booksbound_app/services/connectivity_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/utils/result.dart';
 import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:booksbound_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -160,12 +162,11 @@ class CartScreen extends StatelessWidget {
                                     await ConnectivityService.isOnline();
                                 if (!isOnline) {
                                   if (!context.mounted) return;
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Cannot checkout while offline. Please check your connection.',
-                                      ),
-                                      backgroundColor: Colors.red,
+                                  ErrorPresenter.show(
+                                    context,
+                                    Result.error(
+                                      ResultStatus.networkError,
+                                      'Cannot checkout while offline. Please check your connection.',
                                     ),
                                   );
                                   return;

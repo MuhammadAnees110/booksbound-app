@@ -11,9 +11,9 @@ description: "BooksBound – A full-featured digital bookstore and e-commerce pl
 publish_to: "none"
 
 # Application version for store deployment:
-# 1.0.0 is the Version Name (shown to users)
+# 1.2.0 is the Version Name (shown to users)
 # +1 is the Build Number (internal identifier for app stores, increases with every update)
-version: 1.0.0+1
+version: 1.2.0+1
 
 # -----------------------------------------------------------------------------
 # DART SDK VERSION REQUIREMENTS

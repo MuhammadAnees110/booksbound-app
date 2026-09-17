@@ -1,6 +1,7 @@
 import 'package:booksbound_app/providers/user_auth_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/utils/validators.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -99,28 +100,27 @@ class _LoginScreenState extends State<LoginScreen> {
                                     return;
                                   }
 
-                                  await provider.loginUser(
+                                  final result = await provider.loginUser(
                                     email: _emailController.text,
                                     password: _passwordController.text,
                                   );
 
                                   if (!context.mounted) return;
 
-                                  if (provider.error.isNotEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(provider.error)),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text("Login successful"),
-                                      ),
-                                    );
-                                    Navigator.pushNamed(
-                                      context,
-                                      appRoutes.main,
-                                    );
+                                  if (!result.isSuccess) {
+                                    ErrorPresenter.show(context, result);
+                                    return;
                                   }
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Login successful"),
+                                    ),
+                                  );
+                                  Navigator.pushNamed(
+                                    context,
+                                    appRoutes.main,
+                                  );
                                 },
                           child: provider.isloading
                               ? const CircularProgressIndicator()

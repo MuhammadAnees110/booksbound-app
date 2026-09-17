@@ -1,26 +1,32 @@
 import 'package:booksbound_app/constants/app_constants.dart';
+import 'package:booksbound_app/utils/error_mapper.dart';
+import 'package:booksbound_app/utils/result.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 
 class RatingsService {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
   Map<String, double> _userRatings = {};
 
-  Future<double> getUserRating(String bookId) async {
+  Future<Result<double>> getUserRating(String bookId) async {
     _userRatings = {};
-    await loadUserRatings();
-    return _userRatings[bookId] ?? 0;
+    final loadResult = await loadUserRatings();
+    if (!loadResult.isSuccess) {
+      return Result.error(loadResult.status, loadResult.message);
+    }
+    return Result.success(_userRatings[bookId] ?? 0);
   }
 
   bool hasRated(String bookId) {
     return _userRatings.containsKey(bookId);
   }
 
-  Future<void> rateBook(String bookId, double rating) async {
+  Future<Result<void>> rateBook(String bookId, double rating) async {
     final user = _auth.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      return Result.error(ResultStatus.unauthorized, 'User not authenticated');
+    }
 
     _userRatings[bookId] = rating;
 
@@ -31,23 +37,37 @@ class RatingsService {
           .collection('ratings')
           .doc(bookId)
           .set({'rating': rating, 'updatedAt': FieldValue.serverTimestamp()});
+      return Result.success(null);
+    } on FirebaseAuthException catch (e) {
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
     } catch (e) {
-      debugPrint('Rating error: $e');
+      return ErrorMapper.fromGeneric(e);
     }
   }
 
-  Future<void> loadUserRatings() async {
+  Future<Result<void>> loadUserRatings() async {
     final user = _auth.currentUser;
-    if (user == null) return;
+    if (user == null) return Result.success(null);
 
-    final snapshot = await _firestore
-        .collection(AppConstants.usersCollection)
-        .doc(user.uid)
-        .collection('ratings')
-        .get();
+    try {
+      final snapshot = await _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(user.uid)
+          .collection('ratings')
+          .get();
 
-    for (var doc in snapshot.docs) {
-      _userRatings[doc.id] = doc['rating'];
+      for (var doc in snapshot.docs) {
+        _userRatings[doc.id] = doc['rating'];
+      }
+      return Result.success(null);
+    } on FirebaseAuthException catch (e) {
+      return ErrorMapper.fromAuth(e);
+    } on FirebaseException catch (e) {
+      return ErrorMapper.fromFirebase(e);
+    } catch (e) {
+      return ErrorMapper.fromGeneric(e);
     }
   }
 }

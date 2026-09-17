@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:booksbound_app/features/checkout/order_success_screen.dart';
+import 'package:booksbound_app/models/order_model.dart';
 import 'package:booksbound_app/providers/cart_provider.dart';
 import 'package:booksbound_app/providers/user_auth_provider.dart';
 import 'package:booksbound_app/services/order_service.dart';
-import 'package:booksbound_app/models/order_model.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
-import 'package:booksbound_app/utils/validators.dart';
-import 'package:booksbound_app/widgets/primary_button.dart';
-import 'package:booksbound_app/features/checkout/order_success_screen.dart';
 import 'package:booksbound_app/utils/page_transitions.dart';
+import 'package:booksbound_app/utils/validators.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
+import 'package:booksbound_app/widgets/primary_button.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -54,28 +55,27 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       createdAt: DateTime.now(),
     );
 
-    try {
-      await OrderService().createOrder(order);
-      cartProvider.clearCart();
-      Haptics.success();
+    final result = await OrderService().createOrder(order);
+    if (!result.isSuccess) {
       if (mounted) {
-        Navigator.of(context, rootNavigator: true).pushReplacement(
-          FadeRoute(
-            page: OrderSuccessScreen(
-              orderId: order.id,
-              totalAmount: order.totalAmount,
-            ),
+        ErrorPresenter.show(context, result);
+        setState(() => _isLoading = false);
+      }
+      return;
+    }
+
+    cartProvider.clearCart();
+    Haptics.success();
+    if (mounted) {
+      setState(() => _isLoading = false);
+      Navigator.of(context, rootNavigator: true).pushReplacement(
+        FadeRoute(
+          page: OrderSuccessScreen(
+            orderId: order.id,
+            totalAmount: order.totalAmount,
           ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to place order: $e')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+        ),
+      );
     }
   }
 

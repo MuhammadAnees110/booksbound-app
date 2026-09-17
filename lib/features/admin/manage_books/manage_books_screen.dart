@@ -4,6 +4,7 @@ import 'package:booksbound_app/providers/book_provider.dart';
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/widgets/book_form_dialog.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 
 class ManageBooksScreen extends StatefulWidget {
   const ManageBooksScreen({super.key});
@@ -29,17 +30,19 @@ class _ManageBooksScreenState extends State<ManageBooksScreen> {
       context: context,
       builder: (dialogContext) => BookFormDialog(
         onSubmit: (book, imageFile) async {
-          final success = await _bookProvider.addBook(
+          final result = await _bookProvider.addBook(
             book,
             imageFile: imageFile,
           );
-          if (success && dialogContext.mounted) {
+          if (result.isSuccess && dialogContext.mounted) {
             Navigator.pop(dialogContext);
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Book added successfully')),
               );
             }
+          } else if (!result.isSuccess && mounted) {
+            ErrorPresenter.show(context, result);
           }
         },
       ),
@@ -52,18 +55,20 @@ class _ManageBooksScreenState extends State<ManageBooksScreen> {
       builder: (dialogContext) => BookFormDialog(
         book: book,
         onSubmit: (updatedBook, imageFile) async {
-          final success = await _bookProvider.updateBook(
+          final result = await _bookProvider.updateBook(
             book.id,
             updatedBook,
             imageFile: imageFile,
           );
-          if (success && dialogContext.mounted) {
+          if (result.isSuccess && dialogContext.mounted) {
             Navigator.pop(dialogContext);
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Book updated successfully')),
               );
             }
+          } else if (!result.isSuccess && mounted) {
+            ErrorPresenter.show(context, result);
           }
         },
       ),
@@ -90,11 +95,13 @@ class _ManageBooksScreenState extends State<ManageBooksScreen> {
     );
 
     if (confirm == true) {
-      final success = await _bookProvider.deleteBook(book.id);
-      if (success && mounted) {
+      final result = await _bookProvider.deleteBook(book.id);
+      if (result.isSuccess && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Book deleted successfully')),
         );
+      } else if (!result.isSuccess && mounted) {
+        ErrorPresenter.show(context, result);
       }
     }
   }

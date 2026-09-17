@@ -8,6 +8,7 @@ import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/book_card_skeleton.dart';
 import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +17,12 @@ class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
 
   static Future<void> addToWishlist(BuildContext context, Book book) async {
-    await context.read<WishlistProvider>().toggleWishlist(book.id);
+    final result =
+        await context.read<WishlistProvider>().toggleWishlist(book.id);
+    if (!result.isSuccess && context.mounted) {
+      ErrorPresenter.show(context, result);
+      return;
+    }
     await AnalyticsService.logWishlistAdd(book.id);
   }
 
@@ -70,7 +76,11 @@ class WishlistScreen extends StatelessWidget {
 
                   // Clear wishlist
                   for (final book in matchingBooks) {
-                    await wishlist.removeFromWishlist(book.id);
+                    final result = await wishlist.removeFromWishlist(book.id);
+                    if (!result.isSuccess && context.mounted) {
+                      ErrorPresenter.show(context, result);
+                      return;
+                    }
                   }
 
                   if (!context.mounted) return;
@@ -151,7 +161,11 @@ class WishlistScreen extends StatelessWidget {
                       tooltip: 'Remove from wishlist',
                       onPressed: () async {
                         Haptics.heavy();
-                        await wishlist.removeFromWishlist(book.id);
+                        final result =
+                            await wishlist.removeFromWishlist(book.id);
+                        if (!result.isSuccess && context.mounted) {
+                          ErrorPresenter.show(context, result);
+                        }
                       },
                     ),
                     onTap: () {

@@ -1,5 +1,6 @@
 import 'package:booksbound_app/features/admin/manage_users/services/admin_users_service.dart';
 import 'package:booksbound_app/models/user_model.dart';
+import 'package:booksbound_app/utils/result.dart';
 import 'package:flutter/material.dart';
 
 class AdminUsersProvider extends ChangeNotifier {
@@ -18,28 +19,48 @@ class AdminUsersProvider extends ChangeNotifier {
     _error = '';
     notifyListeners();
 
-    try {
-      _users = await _service.fetchUsers();
-    } catch (e) {
-      _error = e.toString();
+    final result = await _service.fetchUsers();
+    if (result.isSuccess) {
+      _users = result.data ?? [];
+      _error = '';
+    } else {
+      _error = result.message;
     }
 
     _loading = false;
     notifyListeners();
   }
 
-  Future<void> toggleBlock(UserModel user) async {
-    await _service.toggleBlockUser(user.uid, !user.isBlocked);
-    await loadUsers();
+  Future<Result<void>> toggleBlock(UserModel user) async {
+    final result = await _service.toggleBlockUser(user.uid, !user.isBlocked);
+    if (result.isSuccess) {
+      await loadUsers();
+    } else {
+      _error = result.message;
+      notifyListeners();
+    }
+    return result;
   }
 
-  Future<void> makeAdmin(UserModel user) async {
-    await _service.changeRole(user.uid, 'admin');
-    await loadUsers();
+  Future<Result<void>> makeAdmin(UserModel user) async {
+    final result = await _service.changeRole(user.uid, 'admin');
+    if (result.isSuccess) {
+      await loadUsers();
+    } else {
+      _error = result.message;
+      notifyListeners();
+    }
+    return result;
   }
 
-  Future<void> makeUser(UserModel user) async {
-    await _service.changeRole(user.uid, 'user');
-    await loadUsers();
+  Future<Result<void>> makeUser(UserModel user) async {
+    final result = await _service.changeRole(user.uid, 'user');
+    if (result.isSuccess) {
+      await loadUsers();
+    } else {
+      _error = result.message;
+      notifyListeners();
+    }
+    return result;
   }
 }

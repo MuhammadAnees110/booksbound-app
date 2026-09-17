@@ -1,5 +1,6 @@
 import 'package:booksbound_app/models/user_model.dart';
 import 'package:booksbound_app/services/auth_service.dart';
+import 'package:booksbound_app/utils/result.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -12,25 +13,23 @@ class UserAuthProvider extends ChangeNotifier {
   String get error => _error;
   User? get user => FirebaseAuth.instance.currentUser;
 
-  Future<void> registerUser(UserModel userData) async {
-    try {
-      _isloading = true;
-      _error = "";
-      notifyListeners();
+  Future<Result<void>> registerUser(UserModel userData) async {
+    _isloading = true;
+    _error = "";
+    notifyListeners();
 
-      await _authService.register(userData);
-
-      _isloading = false;
+    final result = await _authService.register(userData);
+    if (result.isSuccess) {
       _error = "";
-      notifyListeners();
-    } on FirebaseAuthException catch (e) {
-      _isloading = false;
-      _error = e.toString();
-      notifyListeners();
+    } else {
+      _error = result.message;
     }
+    _isloading = false;
+    notifyListeners();
+    return result;
   }
 
-  Future<void> loginUser({
+  Future<Result<User?>> loginUser({
     required String email,
     required String password,
   }) async {
@@ -38,25 +37,26 @@ class UserAuthProvider extends ChangeNotifier {
     _error = "";
     notifyListeners();
 
-    try {
-      await _authService.login(email: email, password: password);
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isloading = false;
-      notifyListeners();
+    final result = await _authService.login(email: email, password: password);
+    if (result.isSuccess) {
+      _error = "";
+    } else {
+      _error = result.message;
     }
+    _isloading = false;
+    notifyListeners();
+    return result;
   }
 
-  Future<void> logout() async {
-    try {
-      await _authService.logout();
+  Future<Result<void>> logout() async {
+    final result = await _authService.logout();
+    if (result.isSuccess) {
       clear();
-    } catch (e) {
-      _error = e.toString();
+    } else {
+      _error = result.message;
       notifyListeners();
-      rethrow;
     }
+    return result;
   }
 
   Future<bool> changePassword({
@@ -67,19 +67,18 @@ class UserAuthProvider extends ChangeNotifier {
     _error = "";
     notifyListeners();
 
-    try {
-      await _authService.changePassword(
-        currentPassword: currentPassword,
-        newPassword: newPassword,
-      );
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      return false;
-    } finally {
-      _isloading = false;
-      notifyListeners();
+    final result = await _authService.changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+    if (result.isSuccess) {
+      _error = "";
+    } else {
+      _error = result.message;
     }
+    _isloading = false;
+    notifyListeners();
+    return result.isSuccess;
   }
 
   void clear() {

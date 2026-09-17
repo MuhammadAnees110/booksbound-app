@@ -4,6 +4,7 @@ import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/services/books_service.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
+import 'package:booksbound_app/utils/result.dart';
 import 'package:booksbound_app/widgets/book_card_skeleton.dart';
 import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
@@ -72,27 +73,28 @@ class CategoryBooksScreen extends StatelessWidget {
               ),
             ),
           Expanded(
-            child: FutureBuilder<List<Book>>(
+            child: FutureBuilder<Result<List<Book>>>(
               future: booksService.getBooksByGenre(category.name),
               builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: 5,
-              itemBuilder: (_, _) => const BookListTileSkeleton(),
-            );
-          }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: 5,
+                    itemBuilder: (_, _) => const BookListTileSkeleton(),
+                  );
+                }
 
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text(
-                'Error loading books',
-                textAlign: TextAlign.center,
-              ),
-            );
-          }
+                final result = snapshot.data;
+                if (snapshot.hasError || (result != null && !result.isSuccess)) {
+                  return const Center(
+                    child: Text(
+                      'Error loading books',
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }
 
-          final books = snapshot.data ?? [];
+                final books = result?.data ?? [];
 
           if (books.isEmpty) {
             return EmptyState(

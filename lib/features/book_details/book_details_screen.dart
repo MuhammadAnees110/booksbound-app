@@ -11,6 +11,7 @@ import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/utils/haptics.dart';
 import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
+import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:booksbound_app/widgets/primary_button.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
 import 'package:booksbound_app/widgets/skeleton.dart';
@@ -100,9 +101,13 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                           color: Colors.red,
                           size: 25,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           Haptics.medium();
-                          wishlist.toggleWishlist(widget.book.id);
+                          final result =
+                              await wishlist.toggleWishlist(widget.book.id);
+                          if (!result.isSuccess && context.mounted) {
+                            ErrorPresenter.show(context, result);
+                          }
                         },
                       );
                     },
@@ -194,12 +199,15 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                           ),
                           onPressed: hasRated
                               ? null
-                              : () {
+                              : () async {
                                   Haptics.selection();
-                                  ratingsProvider.rateBook(
+                                  final result = await ratingsProvider.rateBook(
                                     widget.book.id,
-                                    index + 1,
+                                    (index + 1).toDouble(),
                                   );
+                                  if (!result.isSuccess && context.mounted) {
+                                    ErrorPresenter.show(context, result);
+                                  }
                                 },
                         );
                       }),
@@ -365,12 +373,15 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                                   : Icons.favorite_border,
                               color: Colors.red,
                             ),
-                            onPressed: () {
+                            onPressed: () async {
                               Haptics.light();
-                              provider.toggleLike(
+                              final result = await provider.toggleLike(
                                 bookId: widget.book.id,
                                 review: review,
                               );
+                              if (!result.isSuccess && context.mounted) {
+                                ErrorPresenter.show(context, result);
+                              }
                             },
                           ),
                           Text(review.likedBy.length.toString()),
