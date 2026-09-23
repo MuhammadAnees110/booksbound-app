@@ -113,7 +113,7 @@ class CategoryBooksScreen extends StatelessWidget {
               return InkWell(
                 onTap: () {
                   Haptics.light();
-                  Navigator.of(context, rootNavigator: true).pushNamed(
+                  Navigator.of(context).pushNamed(
                     AppRoutes.bookDetails,
                     arguments: book,
                   );

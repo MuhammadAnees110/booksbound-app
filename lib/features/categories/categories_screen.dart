@@ -70,7 +70,7 @@ class CategoriesScreen extends StatelessWidget {
                   child: InkWell(
                     onTap: () {
                       Haptics.light();
-                      Navigator.of(context, rootNavigator: true).pushNamed(
+                      Navigator.of(context).pushNamed(
                         AppRoutes.categoryBooks,
                         arguments: cat,
                       );

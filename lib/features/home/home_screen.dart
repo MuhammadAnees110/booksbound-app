@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context, rootNavigator: true).pushNamed(
+                  Navigator.of(context).pushNamed(
                     appRoutes.categories,
                   );
                 },
@@ -114,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 tooltip: 'Category: ${cat.name}',
                 onPressed: () {
                   Haptics.light();
-                  Navigator.of(context, rootNavigator: true).pushNamed(
+                  Navigator.of(context).pushNamed(
                     appRoutes.categoryBooks,
                     arguments: cat,
                   );
@@ -159,10 +159,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(14),
                   onTap: () {
                     Haptics.light();
-                    Navigator.of(
-                      context,
-                      rootNavigator: true,
-                    ).pushNamed(appRoutes.bookDetails, arguments: book);
+                    Navigator.of(context).pushNamed(
+                      appRoutes.bookDetails,
+                      arguments: book,
+                    );
                   },
                   child: Container(
                     width: 150,
@@ -307,10 +307,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(16),
                   onTap: () {
                     Haptics.light();
-                    Navigator.of(
-                      context,
-                      rootNavigator: true,
-                    ).pushNamed(appRoutes.bookDetails, arguments: book);
+                    Navigator.of(context).pushNamed(
+                      appRoutes.bookDetails,
+                      arguments: book,
+                    );
                   },
                 child: Container(
                   decoration: BoxDecoration(

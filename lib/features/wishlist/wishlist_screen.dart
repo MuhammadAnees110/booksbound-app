@@ -128,8 +128,7 @@ class WishlistScreen extends StatelessWidget {
                         actionText: "Discover Books",
                         onAction: () {
                           Haptics.light();
-                          Navigator.of(context, rootNavigator: true)
-                              .pushNamed(AppRoutes.categories);
+                          Navigator.of(context).pushNamed(AppRoutes.categories);
                         },
                       ),
                     ),
@@ -170,10 +169,8 @@ class WishlistScreen extends StatelessWidget {
                     ),
                     onTap: () {
                       Haptics.light();
-                      Navigator.of(
-                        context,
-                        rootNavigator: true,
-                      ).pushNamed(appRoutes.bookDetails, arguments: book);
+                      Navigator.of(context)
+                          .pushNamed(appRoutes.bookDetails, arguments: book);
                     },
                   ),
                 )

@@ -35,8 +35,7 @@ class CartScreen extends StatelessWidget {
               actionText: "Browse Books",
               onAction: () {
                 Haptics.light();
-                Navigator.of(context, rootNavigator: true)
-                    .pushNamed(AppRoutes.categories);
+                Navigator.of(context).pushNamed(AppRoutes.categories);
               },
             )
           : Column(
