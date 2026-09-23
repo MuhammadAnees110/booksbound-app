@@ -34,101 +34,117 @@ class _SearchScreenState extends State<SearchScreen> {
 
     final List<Book> results = bookProvider.search(_query);
 
-    return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                setState(() {
-                  _query = value.trim();
-                });
-              },
-              onSubmitted: (value) {
-                final query = value.trim();
-                if (query.isNotEmpty) {
-                  AnalyticsService.logSearch(query);
-                }
-              },
-              decoration: InputDecoration(
-                hintText: "Search Title, Author, ISBN no",
-                prefixIcon: const Icon(Icons.search_rounded),
-                filled: true,
-                fillColor: Colors.grey.shade200,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (value) {
+                  setState(() {
+                    _query = value.trim();
+                  });
+                },
+                onSubmitted: (value) {
+                  final query = value.trim();
+                  if (query.isNotEmpty) {
+                    AnalyticsService.logSearch(query);
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: "Search Title, Author, ISBN no",
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  filled: true,
+                  fillColor: isDark ? const Color(0xFF2C2C2E) : Colors.grey.shade200,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
             ),
-          ),
 
-          /// 📚 Content
-          Expanded(
-            child: bookProvider.isloading
-                ? ListView.builder(
-                    itemCount: 6,
-                    itemBuilder: (_, _) => const BookListTileSkeleton(),
-                  )
-                : _query.isEmpty
-                    ? _buildEmptyState()
-                    : results.isEmpty
-                        ? _buildNoResults()
-                : ListView.builder(
-                    itemCount: results.length,
-                    itemBuilder: (context, index) {
-                      final book = results[index];
-                      return Semantics(
-                        label: '${book.title} by ${book.author}, ${Formatters.formatCurrency(book.price)}',
-                        button: true,
-                        child: ListTile(
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
-                            child: CachedImage(
-                              imageUrl: book.coverUrl,
-                              width: 45,
-                              fit: BoxFit.cover,
+            /// 📚 Content
+            Expanded(
+              child: bookProvider.isloading
+                  ? ListView.builder(
+                      itemCount: 6,
+                      itemBuilder: (_, _) => const BookListTileSkeleton(),
+                    )
+                  : _query.isEmpty
+                      ? _buildEmptyState(isDark)
+                      : results.isEmpty
+                          ? _buildNoResults()
+                  : ListView.builder(
+                      itemCount: results.length,
+                      itemBuilder: (context, index) {
+                        final book = results[index];
+                        return Semantics(
+                          label: '${book.title} by ${book.author}, ${Formatters.formatCurrency(book.price)}',
+                          button: true,
+                          child: ListTile(
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: CachedImage(
+                                imageUrl: book.coverUrl,
+                                width: 45,
+                                fit: BoxFit.cover,
+                              ),
                             ),
+                            title: Text(book.title),
+                            subtitle: Text(book.author),
+                            trailing: Text(
+                              Formatters.formatCurrency(book.price),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            onTap: () {
+                              Haptics.light();
+                              Navigator.of(context).pushNamed(
+                                appRoutes.bookDetails,
+                                arguments: book,
+                              );
+                            },
                           ),
-                          title: Text(book.title),
-                          subtitle: Text(book.author),
-                          trailing: Text(
-                            Formatters.formatCurrency(book.price),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          onTap: () {
-                            Haptics.light();
-                            Navigator.of(
-                              context,
-                              rootNavigator: true,
-                            ).pushNamed(appRoutes.bookDetails, arguments: book);
-                          },
-                        ),
-                      )
-                          .animate(delay: ((index % 6) * 50).ms)
-                          .fadeIn(duration: 250.ms)
-                          .slideY(begin: 0.1);
-                    },
-                  ),
-          ),
-        ],
+                        )
+                            .animate(delay: ((index % 6) * 50).ms)
+                            .fadeIn(duration: 250.ms)
+                            .slideY(begin: 0.1);
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   /// 💤 Initial Empty State
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isDark) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset('images/bookshelf.png', height: 120),
+          Image.asset(
+            'assets/images/bookshelf.png',
+            height: 120,
+            errorBuilder: (ctx, error, _) => Icon(
+              Icons.library_books,
+              size: 80,
+              color: Colors.grey.shade400,
+            ),
+          ),
           const SizedBox(height: 16),
           Text(
             'Try searching to get started',
-            style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+            style: TextStyle(
+              fontSize: 16,
+              color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+            ),
           ),
         ],
       ),
