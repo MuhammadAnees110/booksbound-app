@@ -31,15 +31,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(title: const Text("Change Password"), centerTitle: true),
       body: Consumer<UserAuthProvider>(
         builder: (context, provider, _) {
-          return Padding(
-            padding: const EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                   _passwordField(
                     controller: _currentController,
                     label: "Current Password",
@@ -113,7 +116,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             ),
                     ),
                   ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

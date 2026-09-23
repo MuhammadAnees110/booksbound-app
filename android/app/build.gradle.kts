@@ -1,14 +1,11 @@
-import com.android.build.api.dsl.ApplicationExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
     id("com.google.gms.google-services")
-    // END: FlutterFire Configuration
-    // The Flutter Gradle Plugin must be applied after the Android plugin.
+    id("org.jetbrains.kotlin.android") version "2.2.20"
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -18,7 +15,7 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
-configure<ApplicationExtension> {
+android {
     namespace = "com.example.e_project"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion

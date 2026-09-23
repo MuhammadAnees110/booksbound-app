@@ -35,6 +35,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(title: const Text('Edit Profile'), centerTitle: true),
       body: Consumer<ProfileProvider>(
         builder: (context, profileProvider, child) {
@@ -49,10 +50,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _isInitialized = true;
           }
 
-          return Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                 // Avatar
                 Stack(
                   alignment: Alignment.bottomRight,
@@ -153,6 +156,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ],
             ),
+          ),
           );
         },
       ),
