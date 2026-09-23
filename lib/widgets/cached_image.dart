@@ -17,7 +17,7 @@ class CachedImage extends StatelessWidget {
     this.height,
     this.fit = BoxFit.cover,
     this.borderRadius = 0.0,
-    this.fallbackAsset = 'images/cover-error.png',
+    this.fallbackAsset = 'assets/images/cover-error.png',
   });
 
   @override
@@ -63,7 +63,7 @@ class CachedImage extends StatelessWidget {
         width: width,
         height: height,
         color: Colors.grey.shade300,
-        child: const Icon(Icons.broken_image, color: Colors.grey),
+        child: const Icon(Icons.book, size: 60, color: Colors.grey),
       ),
     );
 

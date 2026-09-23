@@ -103,8 +103,13 @@ class _ReviewsbooksScreenState extends State<ReviewsbooksScreen> {
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, _, _) {
                                     return Image.asset(
-                                      'images/cover-error.png',
+                                      'assets/images/cover-error.png',
                                       fit: BoxFit.fitWidth,
+                                      errorBuilder: (ctx, e, _) => const Icon(
+                                        Icons.book,
+                                        size: 60,
+                                        color: Colors.grey,
+                                      ),
                                     );
                                   },
                                 ),
