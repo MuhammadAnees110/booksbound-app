@@ -7,9 +7,10 @@ class Brand extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       'BooksBound',
-      style: (Theme.of(
-        context,
-      ).textTheme.headlineLarge)?.copyWith(fontFamily: 'UncialAntiqua'),
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+        fontFamily: 'UncialAntiqua',
+        fontWeight: FontWeight.bold,
+      ),
     );
   }
 }
