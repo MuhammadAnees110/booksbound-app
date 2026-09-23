@@ -27,6 +27,11 @@ service cloud.firestore {
       }
     }
 
+    match /profile_pictures/{userId} {
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+      allow read: if true;
+    }
+
     // Cart: owner can read, write, delete
     match /cart/{itemId} {
       allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;

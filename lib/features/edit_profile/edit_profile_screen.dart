@@ -64,9 +64,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       radius: 55,
                       backgroundImage:
                           userData['photoUrl'] != null &&
-                              (userData['photoUrl'] as String).isNotEmpty
-                          ? MemoryImage(base64Decode(userData['photoUrl']))
-                          : null,
+                                  (userData['photoUrl'] as String).isNotEmpty
+                              ? ((userData['photoUrl'] as String).startsWith('http')
+                                  ? NetworkImage(userData['photoUrl'] as String) as ImageProvider
+                                  : MemoryImage(base64Decode(userData['photoUrl'] as String)))
+                              : null,
                       child:
                           userData['photoUrl'] == null ||
                               (userData['photoUrl'] as String).isEmpty

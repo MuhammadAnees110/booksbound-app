@@ -94,10 +94,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: userData['photoUrl'] != null
-                          ? MemoryImage(base64Decode(userData['photoUrl']))
+                      backgroundImage: (userData['photoUrl'] != null &&
+                              (userData['photoUrl'] as String).isNotEmpty)
+                          ? ((userData['photoUrl'] as String).startsWith('http')
+                              ? NetworkImage(userData['photoUrl'] as String)
+                                  as ImageProvider
+                              : MemoryImage(base64Decode(
+                                  userData['photoUrl'] as String)))
                           : null,
-                      child: userData['photoUrl'] == null
+                      child: (userData['photoUrl'] == null ||
+                              (userData['photoUrl'] as String).isEmpty)
                           ? const Icon(Icons.person, size: 50)
                           : null,
                     ),
@@ -159,20 +165,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         icon: Icons.edit,
                         title: "Edit Profile",
                         onTap: () {
-                          Navigator.of(
-                            context,
-                            rootNavigator: true,
-                          ).pushNamed(appRoutes.editProfile);
+                          Navigator.of(context).pushNamed(appRoutes.editProfile);
                         },
                       ),
                       _profileTile(
                         icon: Icons.lock,
                         title: "Change Password",
                         onTap: () {
-                          Navigator.of(
-                            context,
-                            rootNavigator: true,
-                          ).pushNamed(appRoutes.changePassword);
+                          Navigator.of(context).pushNamed(appRoutes.changePassword);
                         },
                       ),
                       _profileTile(

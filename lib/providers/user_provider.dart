@@ -41,7 +41,7 @@ class ProfileProvider extends ChangeNotifier {
     return result;
   }
 
-  Future<Result<void>> changeProfilePicture() async {
+  Future<Result<String>> changeProfilePicture() async {
     _isloading = true;
     _error = "";
     notifyListeners();

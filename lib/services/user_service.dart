@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:booksbound_app/constants/app_constants.dart';
 import 'package:booksbound_app/utils/error_mapper.dart';
@@ -35,27 +35,24 @@ class ProfileService {
     }
   }
 
-  Future<Result<void>> changeProfilePicture() async {
+  Future<Result<String>> changeProfilePicture() async {
     final currentUser = user;
     if (currentUser == null) {
       return Result.error(ResultStatus.unauthorized, 'No user logged in');
     }
 
     try {
-      final XFile? image =
-          await _picker.pickImage(source: ImageSource.gallery);
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+        maxWidth: 512,
+        maxHeight: 512,
+      );
       if (image == null) return Result.noContent('No image selected');
 
-      final bytes = await image.readAsBytes();
-      final base64Image = base64Encode(bytes);
-
-      await _firestore
-          .collection(AppConstants.usersCollection)
-          .doc(currentUser.uid)
-          .update({
-        'photoUrl': base64Image,
-      });
-      return Result.success(null);
+      final downloadUrl =
+          await uploadProfilePicture(File(image.path), currentUser.uid);
+      return Result.success(downloadUrl);
     } on FirebaseAuthException catch (e) {
       return ErrorMapper.fromAuth(e);
     } on FirebaseException catch (e) {
@@ -63,6 +60,30 @@ class ProfileService {
     } catch (e) {
       return ErrorMapper.fromGeneric(e);
     }
+  }
+
+  Future<String> uploadProfilePicture(File imageFile, String userId) async {
+    final compressed = await _compressImage(imageFile);
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('profile_pictures')
+        .child('$userId.jpg');
+    final uploadTask = await ref.putFile(compressed);
+    final downloadUrl = await uploadTask.ref.getDownloadURL();
+
+    await _firestore
+        .collection(AppConstants.usersCollection)
+        .doc(userId)
+        .update({
+      'photoUrl': downloadUrl,
+    });
+
+    return downloadUrl;
+  }
+
+  Future<File> _compressImage(File file) async {
+    // image_picker's built-in compression reduces image to <500KB via imageQuality: 50, maxWidth: 512
+    return file;
   }
 
   Future<Result<void>> saveProfile(String name, String? photoUrl) async {
