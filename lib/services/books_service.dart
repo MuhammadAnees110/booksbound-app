@@ -150,17 +150,30 @@ class BooksService {
     }
   }
 
-  // Get books by genre
+  // Get books by genre / category
   Future<Result<List<Book>>> getBooksByGenre(String genre) async {
     try {
+      final trimmed = genre.trim();
+      final normalized = trimmed.toLowerCase();
       final querySnapshot = await _firestore
           .collection(AppConstants.booksCollection)
-          .where('genre', isEqualTo: genre)
+          .where(
+            Filter.or(
+              Filter('genre', isEqualTo: trimmed),
+              Filter('genre', isEqualTo: normalized),
+              Filter('category', isEqualTo: trimmed),
+              Filter('category', isEqualTo: normalized),
+              Filter('category_lowercase', isEqualTo: normalized),
+            ),
+          )
           .get();
 
-      final books =
-          querySnapshot.docs.map((doc) => Book.fromJson(doc)).toList();
-      return Result.success(books);
+      final Map<String, Book> uniqueBooks = {};
+      for (final doc in querySnapshot.docs) {
+        final book = Book.fromJson(doc);
+        uniqueBooks[book.id] = book;
+      }
+      return Result.success(uniqueBooks.values.toList());
     } on FirebaseAuthException catch (e) {
       return ErrorMapper.fromAuth(e);
     } on FirebaseException catch (e) {
