@@ -1,6 +1,6 @@
-import 'dart:convert';
 import 'package:booksbound_app/providers/user_provider.dart';
 import 'package:booksbound_app/widgets/error_snackbar.dart';
+import 'package:booksbound_app/widgets/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -60,20 +60,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 Stack(
                   alignment: Alignment.bottomRight,
                   children: [
-                    CircleAvatar(
+                    UserAvatar(
+                      photoUrl: userData['photoUrl'] as String?,
                       radius: 55,
-                      backgroundImage:
-                          userData['photoUrl'] != null &&
-                                  (userData['photoUrl'] as String).isNotEmpty
-                              ? ((userData['photoUrl'] as String).startsWith('http')
-                                  ? NetworkImage(userData['photoUrl'] as String) as ImageProvider
-                                  : MemoryImage(base64Decode(userData['photoUrl'] as String)))
-                              : null,
-                      child:
-                          userData['photoUrl'] == null ||
-                              (userData['photoUrl'] as String).isEmpty
-                          ? const Icon(Icons.person, size: 50)
-                          : null,
                     ),
                     GestureDetector(
                       onTap: profileProvider.isloading

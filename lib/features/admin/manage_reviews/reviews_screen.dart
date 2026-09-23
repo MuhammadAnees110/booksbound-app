@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import 'package:booksbound_app/widgets/error_snackbar.dart';
+import 'package:booksbound_app/widgets/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/reviews_provider.dart';
@@ -46,14 +45,9 @@ class _ReviewsAdminScreenState extends State<ReviewsAdminScreen> {
                     vertical: 8,
                   ),
                   child: ListTile(
-                    leading: CircleAvatar(
+                    leading: UserAvatar(
+                      photoUrl: avatarUrl,
                       radius: 20,
-                      backgroundImage: avatarUrl.isNotEmpty
-                          ? MemoryImage(base64Decode(avatarUrl))
-                          : null,
-                      child: avatarUrl.isEmpty
-                          ? const Icon(Icons.person)
-                          : null,
                     ),
                     title: Text(review.userName),
                     subtitle: Column(

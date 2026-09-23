@@ -9,6 +9,9 @@
 .history
 .svn/
 migrate_working_dir/
+node_modules/
+package.json
+package-lock.json
 
 # IntelliJ related
 *.iml

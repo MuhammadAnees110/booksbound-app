@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:booksbound_app/features/book_details/widgets/write_review_sheet.dart';
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/providers/cart_provider.dart';
@@ -15,6 +13,7 @@ import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:booksbound_app/widgets/primary_button.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
 import 'package:booksbound_app/widgets/skeleton.dart';
+import 'package:booksbound_app/widgets/user_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -346,14 +345,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                   children: provider.reviews.map((review) {
                     final avatarUrl = provider.userAvatars[review.userId] ?? '';
                     return ListTile(
-                      leading: CircleAvatar(
+                      leading: UserAvatar(
+                        photoUrl: avatarUrl,
                         radius: 20,
-                        backgroundImage: avatarUrl.isNotEmpty
-                            ? MemoryImage(base64Decode(avatarUrl))
-                            : null,
-                        child: avatarUrl.isEmpty
-                            ? const Icon(Icons.person)
-                            : null,
                       ),
                       title: Text(
                         review.userName,

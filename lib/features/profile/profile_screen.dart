@@ -15,10 +15,10 @@ import 'package:booksbound_app/utils/result.dart';
 import 'package:booksbound_app/widgets/empty_state.dart';
 import 'package:booksbound_app/widgets/error_snackbar.dart';
 import 'package:booksbound_app/widgets/skeleton.dart';
+import 'package:booksbound_app/widgets/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:convert';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -92,20 +92,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Stack(
                   alignment: Alignment.center,
                   children: [
-                    CircleAvatar(
+                    UserAvatar(
+                      photoUrl: userData['photoUrl'] as String?,
                       radius: 50,
-                      backgroundImage: (userData['photoUrl'] != null &&
-                              (userData['photoUrl'] as String).isNotEmpty)
-                          ? ((userData['photoUrl'] as String).startsWith('http')
-                              ? NetworkImage(userData['photoUrl'] as String)
-                                  as ImageProvider
-                              : MemoryImage(base64Decode(
-                                  userData['photoUrl'] as String)))
-                          : null,
-                      child: (userData['photoUrl'] == null ||
-                              (userData['photoUrl'] as String).isEmpty)
-                          ? const Icon(Icons.person, size: 50)
-                          : null,
                     ),
                     Positioned(
                       bottom: 0,

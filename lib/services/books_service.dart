@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:booksbound_app/constants/app_constants.dart';
@@ -205,10 +206,18 @@ class BooksService {
   }
 
   /// Uploads [imageFile] to Firebase Storage and returns the public download URL.
+  /// If Firebase Storage is unavailable (e.g. Spark free tier), falls back to Base64.
   Future<String> _uploadBookImage(File imageFile, String bookId) async {
-    final fileName = 'book_covers/${DateTime.now().millisecondsSinceEpoch}.jpg';
-    final ref = _storage.ref().child(fileName);
-    final snapshot = await ref.putFile(imageFile);
-    return await snapshot.ref.getDownloadURL();
+    try {
+      final fileName =
+          'book_covers/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final ref = _storage.ref().child(fileName);
+      final snapshot = await ref.putFile(imageFile);
+      return await snapshot.ref.getDownloadURL();
+    } catch (_) {
+      // Graceful fallback to Base64 when Storage is disabled on free tier
+      final bytes = await imageFile.readAsBytes();
+      return base64Encode(bytes);
+    }
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:booksbound_app/constants/app_constants.dart';
@@ -6,7 +7,6 @@ import 'package:booksbound_app/utils/result.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileService {
@@ -35,6 +35,8 @@ class ProfileService {
     }
   }
 
+  /// Picks an image from the gallery, compresses it to 512×512 @ 50% quality,
+  /// encodes it as Base64, and saves it in Firestore (free — no Storage needed).
   Future<Result<String>> changeProfilePicture() async {
     final currentUser = user;
     if (currentUser == null) {
@@ -50,9 +52,17 @@ class ProfileService {
       );
       if (image == null) return Result.noContent('No image selected');
 
-      final downloadUrl =
-          await uploadProfilePicture(File(image.path), currentUser.uid);
-      return Result.success(downloadUrl);
+      // Read bytes and encode as Base64
+      final bytes = await File(image.path).readAsBytes();
+      final base64String = base64Encode(bytes);
+
+      // Save Base64 string directly to Firestore
+      await _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(currentUser.uid)
+          .update({'photoUrl': base64String});
+
+      return Result.success(base64String);
     } on FirebaseAuthException catch (e) {
       return ErrorMapper.fromAuth(e);
     } on FirebaseException catch (e) {
@@ -60,30 +70,6 @@ class ProfileService {
     } catch (e) {
       return ErrorMapper.fromGeneric(e);
     }
-  }
-
-  Future<String> uploadProfilePicture(File imageFile, String userId) async {
-    final compressed = await _compressImage(imageFile);
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('profile_pictures')
-        .child('$userId.jpg');
-    final uploadTask = await ref.putFile(compressed);
-    final downloadUrl = await uploadTask.ref.getDownloadURL();
-
-    await _firestore
-        .collection(AppConstants.usersCollection)
-        .doc(userId)
-        .update({
-      'photoUrl': downloadUrl,
-    });
-
-    return downloadUrl;
-  }
-
-  Future<File> _compressImage(File file) async {
-    // image_picker's built-in compression reduces image to <500KB via imageQuality: 50, maxWidth: 512
-    return file;
   }
 
   Future<Result<void>> saveProfile(String name, String? photoUrl) async {
@@ -195,17 +181,7 @@ class ProfileService {
         });
       }
 
-      // 5. Delete user profile picture from Storage (if exists)
-      try {
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child('profile_pictures/${currentUser.uid}.jpg');
-        await storageRef.delete();
-      } catch (_) {
-        // Picture may not exist, ignore
-      }
-
-      // 6. Delete user document from Firestore
+      // 5. Delete user document from Firestore
       await _firestore
           .collection(AppConstants.usersCollection)
           .doc(currentUser.uid)

@@ -1,7 +1,9 @@
+import 'dart:io';
+
+import 'package:booksbound_app/models/book_model.dart';
+import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:booksbound_app/models/book_model.dart';
-import 'dart:io';
 
 class BookFormDialog extends StatefulWidget {
   final Book? book;
@@ -74,6 +76,9 @@ class _BookFormDialogState extends State<BookFormDialog> {
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
+      maxWidth: 600,
+      maxHeight: 900,
+      imageQuality: 65,
     );
     if (pickedFile != null) {
       setState(() {
@@ -146,13 +151,11 @@ class _BookFormDialogState extends State<BookFormDialog> {
                         )
                       : widget.book?.coverUrl != null &&
                             widget.book!.coverUrl.isNotEmpty
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            widget.book!.coverUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => _buildPlaceholder(),
-                          ),
+                      ? CachedImage(
+                          imageUrl: widget.book!.coverUrl,
+                          width: 120,
+                          height: 180,
+                          borderRadius: 8,
                         )
                       : _buildPlaceholder(),
                 ),
