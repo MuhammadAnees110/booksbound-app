@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:booksbound_app/constants/app_constants.dart';
@@ -7,11 +6,13 @@ import 'package:booksbound_app/utils/result.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileService {
   User? get user => FirebaseAuth.instance.currentUser;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
   final ImagePicker _picker = ImagePicker();
 
   Future<Result<Map<String, dynamic>?>> getUserData() async {
@@ -35,8 +36,8 @@ class ProfileService {
     }
   }
 
-  /// Picks an image from the gallery, compresses it to 512×512 @ 50% quality,
-  /// encodes it as Base64, and saves it in Firestore (free — no Storage needed).
+  /// Uploads the selected avatar to Firebase Storage and stores only the
+  /// public URL in Firestore to keep payloads bounded and avoid leaking raw data.
   Future<Result<String>> changeProfilePicture() async {
     final currentUser = user;
     if (currentUser == null) {
@@ -52,17 +53,22 @@ class ProfileService {
       );
       if (image == null) return Result.noContent('No image selected');
 
-      // Read bytes and encode as Base64
-      final bytes = await File(image.path).readAsBytes();
-      final base64String = base64Encode(bytes);
+      final imageFile = File(image.path);
+      final storageRef = _storage.ref().child(
+        'profile_pictures/${currentUser.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg',
+      );
+      final uploadTask = await storageRef.putFile(
+        imageFile,
+        SettableMetadata(contentType: 'image/jpeg'),
+      );
+      final imageUrl = await uploadTask.ref.getDownloadURL();
 
-      // Save Base64 string directly to Firestore
       await _firestore
           .collection(AppConstants.usersCollection)
           .doc(currentUser.uid)
-          .update({'photoUrl': base64String});
+          .update({'photoUrl': imageUrl});
 
-      return Result.success(base64String);
+      return Result.success(imageUrl);
     } on FirebaseAuthException catch (e) {
       return ErrorMapper.fromAuth(e);
     } on FirebaseException catch (e) {
@@ -82,10 +88,7 @@ class ProfileService {
       await _firestore
           .collection(AppConstants.usersCollection)
           .doc(currentUser.uid)
-          .update({
-        'name': name,
-        'photoUrl': photoUrl,
-      });
+          .update({'name': name, 'photoUrl': photoUrl});
       return Result.success(null);
     } on FirebaseAuthException catch (e) {
       return ErrorMapper.fromAuth(e);

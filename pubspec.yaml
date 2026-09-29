@@ -88,6 +88,8 @@ dependencies:
 # DEVELOPMENT DEPENDENCIES (Tools used during development, omitted from final app build)
 # -----------------------------------------------------------------------------
 dev_dependencies:
+  integration_test:
+    sdk: flutter
   # Core testing library provided by Flutter SDK for running unit and widget tests
   flutter_test:
     sdk: flutter

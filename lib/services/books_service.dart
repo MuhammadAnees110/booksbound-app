@@ -10,14 +10,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class BooksService {
+  static const int _defaultPageSize = 20;
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  // Fetch all books
-  Future<Result<List<Book>>> fetchBooks() async {
+  // Fetch books in fixed-size pages to avoid unbounded reads.
+  Future<Result<List<Book>>> fetchBooks({
+    DocumentSnapshot<Map<String, dynamic>>? lastDoc,
+    int pageSize = _defaultPageSize,
+  }) async {
     try {
-      final snapshot =
-          await _firestore.collection(AppConstants.booksCollection).get();
+      Query<Map<String, dynamic>> query = _firestore
+          .collection(AppConstants.booksCollection)
+          .limit(pageSize);
+
+      if (lastDoc != null) {
+        query = query.startAfterDocument(lastDoc);
+      }
+
+      final snapshot = await query.get();
 
       final books = snapshot.docs.map((doc) {
         return Book.fromJson(doc);
@@ -76,7 +88,11 @@ class BooksService {
   }
 
   // Update existing book
-  Future<Result<void>> updateBook(String bookId, Book book, {File? imageFile}) async {
+  Future<Result<void>> updateBook(
+    String bookId,
+    Book book, {
+    File? imageFile,
+  }) async {
     try {
       final updateData = book.toMap();
 
@@ -123,12 +139,14 @@ class BooksService {
           .collection(AppConstants.booksCollection)
           .where('title', isGreaterThanOrEqualTo: query)
           .where('title', isLessThan: '${query}z')
+          .limit(20)
           .get();
 
       final authorQuery = await _firestore
           .collection(AppConstants.booksCollection)
           .where('author', isGreaterThanOrEqualTo: query)
           .where('author', isLessThan: '${query}z')
+          .limit(20)
           .get();
 
       final allBooks = [
@@ -193,8 +211,9 @@ class BooksService {
           .limit(10)
           .get();
 
-      final books =
-          querySnapshot.docs.map((doc) => Book.fromJson(doc)).toList();
+      final books = querySnapshot.docs
+          .map((doc) => Book.fromJson(doc))
+          .toList();
       return Result.success(books);
     } on FirebaseAuthException catch (e) {
       return ErrorMapper.fromAuth(e);
