@@ -10,16 +10,19 @@ class CategoryProvider extends ChangeNotifier {
   List<CategoryModel> _categories = CategoryService.defaultCategories;
   bool _isLoading = false;
   String _error = '';
+  StreamSubscription? _categoriesSubscription;
 
   List<CategoryModel> get categories => _categories;
   bool get isLoading => _isLoading;
   String get error => _error;
 
   CategoryProvider() {
-    loadCategories();
+    unawaited(loadCategories());
   }
 
   Future<void> loadCategories() async {
+    unawaited(_categoriesSubscription?.cancel());
+    _categoriesSubscription = null;
     _isLoading = true;
     _error = '';
     notifyListeners();
@@ -27,24 +30,34 @@ class CategoryProvider extends ChangeNotifier {
     try {
       unawaited(_categoryService.seedDefaultCategories());
 
-      _categoryService.getCategories().listen((result) {
-        if (result.isSuccess) {
-          _categories = result.data ?? [];
-          _error = '';
-        } else {
-          _error = result.message;
-        }
-        _isLoading = false;
-        notifyListeners();
-      }, onError: (e) {
-        _error = e.toString();
-        _isLoading = false;
-        notifyListeners();
-      });
+      _categoriesSubscription = _categoryService.getCategories().listen(
+        (result) {
+          if (result.isSuccess) {
+            _categories = result.data ?? [];
+            _error = '';
+          } else {
+            _error = result.message;
+          }
+          _isLoading = false;
+          notifyListeners();
+        },
+        onError: (e) {
+          _error = e.toString();
+          _isLoading = false;
+          notifyListeners();
+        },
+      );
     } catch (e) {
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    unawaited(_categoriesSubscription?.cancel());
+    _categoriesSubscription = null;
+    super.dispose();
   }
 }

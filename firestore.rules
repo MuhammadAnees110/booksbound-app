@@ -16,10 +16,12 @@ service cloud.firestore {
         get(/databases/$(database)/documents/user/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // Users can read/write/delete their own profile
+    // Users can read profiles; only owners can update non-role profile fields.
     match /user/{userId} {
       allow read: if isAuthenticated();
-      allow create, update: if isOwner(userId);
+      allow create: if isAuthenticated() && request.resource.data.role == 'user';
+      allow update: if isOwner(userId) &&
+        !('role' in request.resource.data.diff(resource.data).affectedKeys());
       allow delete: if isOwner(userId) || isAdmin();
 
       match /{allSubcollections=**} {

@@ -37,8 +37,8 @@ class _PrimaryButtonState extends State<PrimaryButton>
     final theme = Theme.of(context);
     final isEnabled = widget.onPressed != null && !widget.isLoading;
 
-    final bgColor = widget.backgroundColor ?? theme.primaryColor;
-    final fgColor = widget.textColor ?? Colors.white;
+    final bgColor = widget.backgroundColor ?? theme.colorScheme.primary;
+    final fgColor = widget.textColor ?? theme.colorScheme.onPrimary;
 
     return GestureDetector(
       onTapDown: isEnabled ? (_) => setState(() => _isPressed = true) : null,
