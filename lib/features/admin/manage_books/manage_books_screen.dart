@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:booksbound_app/providers/book_provider.dart';
 import 'package:booksbound_app/models/book_model.dart';
@@ -30,7 +31,7 @@ class _ManageBooksScreenState extends State<ManageBooksScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => BookFormDialog(
-        onSubmit: (book, imageFile) async {
+        onSubmit: (book, XFile? imageFile) async {
           final result = await _bookProvider.addBook(
             book,
             imageFile: imageFile,
@@ -55,7 +56,7 @@ class _ManageBooksScreenState extends State<ManageBooksScreen> {
       context: context,
       builder: (dialogContext) => BookFormDialog(
         book: book,
-        onSubmit: (updatedBook, imageFile) async {
+        onSubmit: (updatedBook, XFile? imageFile) async {
           final result = await _bookProvider.updateBook(
             book.id,
             updatedBook,

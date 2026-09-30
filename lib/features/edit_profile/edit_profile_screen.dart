@@ -50,64 +50,71 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _isInitialized = true;
           }
 
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                // Avatar
-                Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    UserAvatar(
-                      photoUrl: userData['photoUrl'] as String?,
-                      radius: 55,
-                    ),
-                    GestureDetector(
-                      onTap: profileProvider.isloading
-                          ? null
-                          : profileProvider.changeProfilePicture,
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(
-                          color: Colors.blue,
-                          shape: BoxShape.circle,
+          return Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Avatar
+                        Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            UserAvatar(
+                              photoUrl: userData['photoUrl'] as String?,
+                              radius: 55,
+                            ),
+                            GestureDetector(
+                              onTap: profileProvider.isloading
+                                  ? null
+                                  : profileProvider.changeProfilePicture,
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: const BoxDecoration(
+                                  color: Colors.blue,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 18,
+
+                        const SizedBox(height: 30),
+
+                        Form(
+                          key: _formKey,
+                          child: TextFormField(
+                            controller: _nameController,
+                            decoration: const InputDecoration(
+                              labelText: "Name",
+                              prefixIcon: Icon(Icons.person),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(15),
+                                ),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return "Please enter a Name";
+                              }
+                              return null;
+                            },
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-
-                const SizedBox(height: 30),
-
-                Form(
-                  key: _formKey,
-                  child: TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: "Name",
-                      prefixIcon: Icon(Icons.person),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return "Please enter a Name";
-                      }
-                      return null;
-                    },
                   ),
                 ),
-
-                const Spacer(),
-
+                const SizedBox(height: 20),
                 // Save button
                 SizedBox(
                   width: double.infinity,
@@ -147,7 +154,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ],
             ),
-          ),
           );
         },
       ),

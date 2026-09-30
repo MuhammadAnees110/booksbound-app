@@ -7,10 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 class RatingsService {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
-  Map<String, double> _userRatings = {};
+  final Map<String, double> _userRatings = {};
 
   Future<Result<double>> getUserRating(String bookId) async {
-    _userRatings = {};
     final loadResult = await loadUserRatings();
     if (!loadResult.isSuccess) {
       return Result.error(loadResult.status, loadResult.message);

@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/widgets/cached_image.dart';
@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 
 class BookFormDialog extends StatefulWidget {
   final Book? book;
-  final Function(Book, File?) onSubmit;
+  final Function(Book, XFile?) onSubmit;
 
   const BookFormDialog({super.key, this.book, required this.onSubmit});
 
@@ -22,11 +22,13 @@ class _BookFormDialogState extends State<BookFormDialog> {
   final _genreController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
+  final _stockController = TextEditingController();
   final _isbnController = TextEditingController();
   final _ratingController = TextEditingController();
 
   DateTime? _selectedDate;
-  File? _selectedImage;
+  XFile? _selectedImage;
+  Uint8List? _selectedImageBytes;
   bool _isBestseller = false;
 
   final List<String> _genreSuggestions = [
@@ -51,12 +53,14 @@ class _BookFormDialogState extends State<BookFormDialog> {
       _genreController.text = widget.book!.genre;
       _descriptionController.text = widget.book!.description;
       _priceController.text = widget.book!.price.toString();
+      _stockController.text = widget.book!.stock.toString();
       _isbnController.text = widget.book!.isbn;
       _ratingController.text = widget.book!.rating.toString();
       _selectedDate = widget.book!.releaseDate;
       _isBestseller = widget.book!.isBestseller;
     } else {
       _selectedDate = DateTime.now();
+      _stockController.text = '20';
       _ratingController.text = '4.5';
     }
   }
@@ -68,6 +72,7 @@ class _BookFormDialogState extends State<BookFormDialog> {
     _genreController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
+    _stockController.dispose();
     _isbnController.dispose();
     _ratingController.dispose();
     super.dispose();
@@ -81,8 +86,10 @@ class _BookFormDialogState extends State<BookFormDialog> {
       imageQuality: 65,
     );
     if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
       setState(() {
-        _selectedImage = File(pickedFile.path);
+        _selectedImage = pickedFile;
+        _selectedImageBytes = bytes;
       });
     }
   }
@@ -112,6 +119,7 @@ class _BookFormDialogState extends State<BookFormDialog> {
         description: _descriptionController.text.trim(),
         coverUrl: widget.book?.coverUrl ?? '',
         price: double.parse(_priceController.text),
+        stock: int.parse(_stockController.text),
         isBestseller: _isBestseller,
         releaseDate: _selectedDate!,
         isbn: _isbnController.text.trim(),
@@ -144,10 +152,10 @@ class _BookFormDialogState extends State<BookFormDialog> {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.grey),
                   ),
-                  child: _selectedImage != null
+                  child: _selectedImageBytes != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.file(_selectedImage!, fit: BoxFit.cover),
+                          child: Image.memory(_selectedImageBytes!, fit: BoxFit.cover),
                         )
                       : widget.book?.coverUrl != null &&
                             widget.book!.coverUrl.isNotEmpty
@@ -246,6 +254,24 @@ class _BookFormDialogState extends State<BookFormDialog> {
                   }
                   if (double.tryParse(value) == null) {
                     return 'Please enter valid price';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+
+              // Available inventory
+              TextFormField(
+                controller: _stockController,
+                decoration: const InputDecoration(
+                  labelText: 'Stock *',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  final stock = int.tryParse(value?.trim() ?? '');
+                  if (stock == null || stock < 0) {
+                    return 'Enter a whole number of 0 or more';
                   }
                   return null;
                 },

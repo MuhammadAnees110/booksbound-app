@@ -17,8 +17,9 @@ class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
 
   static Future<void> addToWishlist(BuildContext context, Book book) async {
-    final result =
-        await context.read<WishlistProvider>().toggleWishlist(book.id);
+    final result = await context.read<WishlistProvider>().toggleWishlist(
+      book.id,
+    );
     if (!result.isSuccess && context.mounted) {
       ErrorPresenter.show(context, result);
       return;
@@ -68,15 +69,15 @@ class WishlistScreen extends StatelessWidget {
                       .where((b) => wishlist.items.contains(b.id))
                       .toList();
 
-                  int count = 0;
+                  final addedBookIds = <String>[];
                   for (final book in matchingBooks) {
-                    cartProvider.addToCart(book);
-                    count++;
+                    if (await cartProvider.addToCart(book)) {
+                      addedBookIds.add(book.id);
+                    }
                   }
 
-                  // Clear wishlist
-                  for (final book in matchingBooks) {
-                    final result = await wishlist.removeFromWishlist(book.id);
+                  for (final bookId in addedBookIds) {
+                    final result = await wishlist.removeFromWishlist(bookId);
                     if (!result.isSuccess && context.mounted) {
                       ErrorPresenter.show(context, result);
                       return;
@@ -87,7 +88,11 @@ class WishlistScreen extends StatelessWidget {
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('$count item(s) moved to cart'),
+                      content: Text(
+                        addedBookIds.isEmpty
+                            ? 'No additional copies are available.'
+                            : '${addedBookIds.length} item(s) moved to cart',
+                      ),
                       backgroundColor: Colors.green,
                       action: SnackBarAction(
                         label: 'View Cart',
@@ -117,68 +122,74 @@ class WishlistScreen extends StatelessWidget {
                 itemBuilder: (_, _) => const BookListTileSkeleton(),
               )
             : wishlist.items.isEmpty
-                ? SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.7,
-                      child: EmptyState(
-                        icon: Icons.favorite_border,
-                        title: "No favorites yet",
-                        subtitle: "Tap the heart on any book to save it here",
-                        actionText: "Discover Books",
-                        onAction: () {
-                          Haptics.light();
-                          Navigator.of(context).pushNamed(AppRoutes.categories);
-                        },
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: wishlist.items.length,
-              itemBuilder: (context, index) {
-                final books = booksProvider.visibleBooks
-                    .where((b) => wishlist.items.contains(b.id))
-                    .toList();
-                final book = books[index];
-                return Semantics(
-                  label: '${book.title} by ${book.author}',
-                  button: true,
-                  child: ListTile(
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: CachedImage(
-                        imageUrl: book.coverUrl,
-                        width: 50,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    title: Text(book.title),
-                    subtitle: Text(book.author),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      tooltip: 'Remove from wishlist',
-                      onPressed: () async {
-                        Haptics.heavy();
-                        final result =
-                            await wishlist.removeFromWishlist(book.id);
-                        if (!result.isSuccess && context.mounted) {
-                          ErrorPresenter.show(context, result);
-                        }
-                      },
-                    ),
-                    onTap: () {
+            ? SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: EmptyState(
+                    icon: Icons.favorite_border,
+                    title: "No favorites yet",
+                    subtitle: "Tap the heart on any book to save it here",
+                    actionText: "Discover Books",
+                    onAction: () {
                       Haptics.light();
-                      Navigator.of(context)
-                          .pushNamed(appRoutes.bookDetails, arguments: book);
+                      Navigator.of(context).pushNamed(AppRoutes.categories);
                     },
                   ),
-                )
-                    .animate(delay: ((index % 6) * 50).ms)
-                    .fadeIn(duration: 250.ms)
-                    .slideY(begin: 0.1);
-              },
-            ),
+                ),
+              )
+            : Builder(
+                builder: (context) {
+                  final books = booksProvider.visibleBooks
+                      .where((b) => wishlist.items.contains(b.id))
+                      .toList();
+                  return ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: books.length,
+                    itemBuilder: (context, index) {
+                      final book = books[index];
+                      return Semantics(
+                            label: '${book.title} by ${book.author}',
+                            button: true,
+                            child: ListTile(
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: CachedImage(
+                                  imageUrl: book.coverUrl,
+                                  width: 50,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              title: Text(book.title),
+                              subtitle: Text(book.author),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                tooltip: 'Remove from wishlist',
+                                onPressed: () async {
+                                  Haptics.heavy();
+                                  final result = await wishlist.removeFromWishlist(
+                                    book.id,
+                                  );
+                                  if (!result.isSuccess && context.mounted) {
+                                    ErrorPresenter.show(context, result);
+                                  }
+                                },
+                              ),
+                              onTap: () {
+                                Haptics.light();
+                                Navigator.of(
+                                  context,
+                                ).pushNamed(appRoutes.bookDetails, arguments: book);
+                              },
+                            ),
+                          )
+                          .animate(delay: ((index % 6) * 50).ms)
+                          .fadeIn(duration: 250.ms)
+                          .slideY(begin: 0.1);
+                    },
+                  );
+                },
+              ),
       ),
     );
   }

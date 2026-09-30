@@ -10,8 +10,11 @@
 .svn/
 migrate_working_dir/
 node_modules/
-package.json
-package-lock.json
+playwright-report/
+test-results/
+playwright/.auth/
+.env*
+!.env.example
 
 # IntelliJ related
 *.iml

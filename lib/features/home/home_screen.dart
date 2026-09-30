@@ -61,7 +61,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 20),
                   _buildBookCarousel(bookProvider.newArrivals, 'New Arrivals'),
                   const SizedBox(height: 20),
-                  _buildBookGrid(bookProvider.visibleBooks, 'All Books', context),
+                  _buildBookGrid(
+                    bookProvider.visibleBooks,
+                    'All Books',
+                    context,
+                  ),
                 ],
               ),
             ),
@@ -89,9 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    appRoutes.categories,
-                  );
+                  Navigator.of(context).pushNamed(appRoutes.categories);
                 },
                 child: const Text('See All'),
               ),
@@ -114,15 +116,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 tooltip: 'Category: ${cat.name}',
                 onPressed: () {
                   Haptics.light();
-                  Navigator.of(context).pushNamed(
-                    appRoutes.categoryBooks,
-                    arguments: cat,
-                  );
+                  Navigator.of(
+                    context,
+                  ).pushNamed(appRoutes.categoryBooks, arguments: cat);
                 },
-              )
-                  .animate()
-                  .fadeIn(duration: 250.ms)
-                  .slideX(begin: -0.2);
+              ).animate().fadeIn(duration: 250.ms).slideX(begin: -0.2);
             },
           ),
         ),
@@ -145,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 8),
         SizedBox(
-          height: 220,
+          height: 230,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: books.length,
@@ -153,16 +151,16 @@ class _HomeScreenState extends State<HomeScreen> {
               final book = books[index];
 
               return Semantics(
-                label: '${book.title} by ${book.author}, ${Formatters.formatCurrency(book.price)}',
+                label:
+                    '${book.title} by ${book.author}, ${Formatters.formatCurrency(book.price)}',
                 button: true,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(14),
                   onTap: () {
                     Haptics.light();
-                    Navigator.of(context).pushNamed(
-                      appRoutes.bookDetails,
-                      arguments: book,
-                    );
+                    Navigator.of(
+                      context,
+                    ).pushNamed(appRoutes.bookDetails, arguments: book);
                   },
                   child: Container(
                     width: 150,
@@ -187,7 +185,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: CachedImage(
                                   imageUrl: book.coverUrl,
                                   height: 140,
-                                  width: double.infinity,
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -199,9 +196,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: 28,
                                   child: Consumer<WishlistProvider>(
                                     builder: (context, wishlist, _) {
-                                      final isWishlisted = wishlist.isInWishlist(
-                                        book.id,
-                                      );
+                                      final isWishlisted = wishlist
+                                          .isInWishlist(book.id);
                                       return IconButton(
                                         padding: EdgeInsets.zero,
                                         tooltip: isWishlisted
@@ -248,10 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-              )
-                  .animate()
-                  .fadeIn(duration: 300.ms)
-                  .slideX(begin: 0.1);
+              ).animate().fadeIn(duration: 300.ms).slideX(begin: 0.1);
             },
           ),
         ),
@@ -301,108 +294,113 @@ class _HomeScreenState extends State<HomeScreen> {
               final book = books[index];
 
               return Semantics(
-                label: '${book.title} by ${book.author}, ${Formatters.formatCurrency(book.price)}',
-                button: true,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: () {
-                    Haptics.light();
-                    Navigator.of(context).pushNamed(
-                      appRoutes.bookDetails,
-                      arguments: book,
-                    );
-                  },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outline,
-                      width: 1,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Stack(
+                    label:
+                        '${book.title} by ${book.author}, ${Formatters.formatCurrency(book.price)}',
+                    button: true,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        Haptics.light();
+                        Navigator.of(
+                          context,
+                        ).pushNamed(appRoutes.bookDetails, arguments: book);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.outline,
+                            width: 1,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Hero(
-                                  tag: 'book-cover-${book.id}',
-                                  child: CachedImage(
-                                    imageUrl: book.coverUrl,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
+                              Expanded(
+                                child: Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Hero(
+                                        tag: 'book-cover-${book.id}',
+                                        child: CachedImage(
+                                          imageUrl: book.coverUrl,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 8,
+                                      right: 8,
+                                      child: SizedBox(
+                                        width: 28,
+                                        height: 28,
+                                        child: Consumer<WishlistProvider>(
+                                          builder: (context, wishlist, _) {
+                                            final isWishlisted = wishlist
+                                                .isInWishlist(book.id);
+                                            return IconButton(
+                                              padding: EdgeInsets.zero,
+                                              tooltip: isWishlisted
+                                                  ? 'Remove from wishlist'
+                                                  : 'Add to wishlist',
+                                              icon: Icon(
+                                                isWishlisted
+                                                    ? Icons.favorite
+                                                    : Icons.favorite_border,
+                                                color: Colors.red,
+                                                size: 25,
+                                              ),
+                                              onPressed: () {
+                                                Haptics.medium();
+                                                wishlist.toggleWishlist(
+                                                  book.id,
+                                                );
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              Positioned(
-                                top: 8,
-                                right: 8,
-                                child: SizedBox(
-                                  width: 28,
-                                  height: 28,
-                                  child: Consumer<WishlistProvider>(
-                                    builder: (context, wishlist, _) {
-                                      final isWishlisted = wishlist
-                                          .isInWishlist(book.id);
-                                      return IconButton(
-                                        padding: EdgeInsets.zero,
-                                        tooltip: isWishlisted
-                                            ? 'Remove from wishlist'
-                                            : 'Add to wishlist',
-                                        icon: Icon(
-                                          isWishlisted
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                          color: Colors.red,
-                                          size: 25,
-                                        ),
-                                        onPressed: () {
-                                          Haptics.medium();
-                                          wishlist.toggleWishlist(book.id);
-                                        },
-                                      );
-                                    },
-                                  ),
+                              const SizedBox(height: 8),
+                              Text(
+                                book.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                book.author,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              buildRatingStars(rating: book.rating),
+                              const SizedBox(height: 4),
+                              Text(
+                                Formatters.formatCurrency(book.price),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          book.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          book.author,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        buildRatingStars(rating: book.rating),
-                        const SizedBox(height: 4),
-                        Text(
-                          Formatters.formatCurrency(book.price),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            )
+                  )
                   .animate(delay: ((index % 6) * 50).ms)
                   .fadeIn(duration: 300.ms)
                   .slideY(begin: 0.1);

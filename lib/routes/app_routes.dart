@@ -22,6 +22,7 @@ import 'package:booksbound_app/features/checkout/order_success_screen.dart';
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/models/category_model.dart';
 import 'package:booksbound_app/utils/page_transitions.dart';
+import 'package:booksbound_app/widgets/admin_route_guard.dart';
 import 'package:flutter/material.dart';
 
 class AppRoutes {
@@ -55,20 +56,24 @@ class AppRoutes {
     login: (context) => const LoginScreen(),
     forgotPassword: (context) => const ForgotPasswordScreen(),
     categories: (context) => const CategoriesScreen(),
-    adminPanel: (context) => const AdminPanelScreen(),
-    manageBooks: (context) => const ManageBooksScreen(),
-    manageOrders: (context) => const ManageOrdersScreen(),
-    manageReviewsBooks: (context) => const ReviewsbooksScreen(),
-    manageUsers: (context) => const AdminUsersScreen(),
-    analytics: (context) => const AdminAnalyticsScreen(),
+    adminPanel: (context) => const AdminRouteGuard(child: AdminPanelScreen()),
+    manageBooks: (context) => const AdminRouteGuard(child: ManageBooksScreen()),
+    manageOrders: (context) =>
+        const AdminRouteGuard(child: ManageOrdersScreen()),
+    manageReviewsBooks: (context) =>
+        const AdminRouteGuard(child: ReviewsbooksScreen()),
+    manageUsers: (context) => const AdminRouteGuard(child: AdminUsersScreen()),
+    analytics: (context) =>
+        const AdminRouteGuard(child: AdminAnalyticsScreen()),
   };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case bookDetails:
-        final book = settings.arguments as Book;
+        final argument = settings.arguments;
+        if (argument is! Book) return _notFoundRoute(settings);
         return SlideRightRoute(
-          page: BookDetailsScreen(book: book),
+          page: BookDetailsScreen(book: argument),
           settings: settings,
         );
 
@@ -91,21 +96,16 @@ class AppRoutes {
         );
 
       case wishlist:
-        return FadeRoute(
-          page: const WishlistScreen(),
-          settings: settings,
-        );
+        return FadeRoute(page: const WishlistScreen(), settings: settings);
 
       case categories:
-        return FadeRoute(
-          page: const CategoriesScreen(),
-          settings: settings,
-        );
+        return FadeRoute(page: const CategoriesScreen(), settings: settings);
 
       case categoryBooks:
-        final category = settings.arguments as CategoryModel;
+        final argument = settings.arguments;
+        if (argument is! CategoryModel) return _notFoundRoute(settings);
         return SlideRightRoute(
-          page: CategoryBooksScreen(category: category),
+          page: CategoryBooksScreen(category: argument),
           settings: settings,
         );
 
@@ -117,32 +117,47 @@ class AppRoutes {
 
       case adminPanel:
         return FadeRoute(
-          page: const AdminPanelScreen(),
+          page: const AdminRouteGuard(child: AdminPanelScreen()),
           settings: settings,
         );
 
       case manageBooks:
         return SlideRightRoute(
-          page: const ManageBooksScreen(),
+          page: const AdminRouteGuard(child: ManageBooksScreen()),
           settings: settings,
         );
 
       case manageOrders:
         return SlideRightRoute(
-          page: const ManageOrdersScreen(),
+          page: const AdminRouteGuard(child: ManageOrdersScreen()),
           settings: settings,
         );
 
       case manageReviewsBooks:
         return SlideRightRoute(
-          page: const ReviewsbooksScreen(),
+          page: const AdminRouteGuard(child: ReviewsbooksScreen()),
           settings: settings,
         );
 
       case manageReviews:
-        final bookId = settings.arguments as String;
+        final bookId = settings.arguments;
+        if (bookId is! String || bookId.isEmpty) {
+          return _notFoundRoute(settings);
+        }
         return SlideRightRoute(
-          page: ReviewsAdminScreen(bookId: bookId),
+          page: AdminRouteGuard(child: ReviewsAdminScreen(bookId: bookId)),
+          settings: settings,
+        );
+
+      case manageUsers:
+        return SlideRightRoute(
+          page: const AdminRouteGuard(child: AdminUsersScreen()),
+          settings: settings,
+        );
+
+      case analytics:
+        return FadeRoute(
+          page: const AdminRouteGuard(child: AdminAnalyticsScreen()),
           settings: settings,
         );
 
@@ -153,11 +168,16 @@ class AppRoutes {
         );
 
       case orderSuccess:
-        final args = settings.arguments as Map<String, dynamic>;
+        final args = settings.arguments;
+        if (args is! Map<String, dynamic> ||
+            args['orderId'] is! String ||
+            args['totalAmount'] is! num) {
+          return _notFoundRoute(settings);
+        }
         return FadeRoute(
           page: OrderSuccessScreen(
             orderId: args['orderId'] as String,
-            totalAmount: args['totalAmount'] as double,
+            totalAmount: (args['totalAmount'] as num).toDouble(),
           ),
           settings: settings,
         );
@@ -168,6 +188,13 @@ class AppRoutes {
           settings: settings,
         );
     }
+  }
+
+  static Route<dynamic> _notFoundRoute(RouteSettings settings) {
+    return FadeRoute(
+      page: const Scaffold(body: Center(child: Text('Route not found'))),
+      settings: settings,
+    );
   }
 }
 

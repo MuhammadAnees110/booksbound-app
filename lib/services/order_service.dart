@@ -31,56 +31,52 @@ class OrderService {
   }
 
   Stream<Result<List<OrderModel>>> getUserOrders(String userId) {
-    return _db
-        .collection(AppConstants.ordersCollection)
-        .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snapshot) {
-      try {
-        final orders =
-            snapshot.docs.map((doc) => OrderModel.fromSnapshot(doc)).toList();
-        return Result.success(orders);
-      } catch (e) {
-        return Result<List<OrderModel>>.error(
-            ResultStatus.serverError, 'Failed to parse order data');
-      }
-    }).handleError((e) {
-      if (e is FirebaseException) {
-        return ErrorMapper.fromFirestore<List<OrderModel>>(e);
-      }
-      return ErrorMapper.fromGeneric<List<OrderModel>>(e);
-    });
+    return _watchOrders(
+      _db
+          .collection(AppConstants.ordersCollection)
+          .where('userId', isEqualTo: userId)
+          .limit(50),
+    );
   }
 
   Stream<Result<List<OrderModel>>> getAllOrders() {
-    return _db
-        .collection(AppConstants.ordersCollection)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snapshot) {
-      try {
-        final orders =
-            snapshot.docs.map((doc) => OrderModel.fromSnapshot(doc)).toList();
-        return Result.success(orders);
-      } catch (e) {
-        return Result<List<OrderModel>>.error(
-            ResultStatus.serverError, 'Failed to parse order data');
+    return _watchOrders(
+      _db
+          .collection(AppConstants.ordersCollection)
+          .orderBy('createdAt', descending: true),
+    );
+  }
+
+  Stream<Result<List<OrderModel>>> _watchOrders(
+    Query<Map<String, dynamic>> query,
+  ) async* {
+    try {
+      await for (final snapshot in query.snapshots()) {
+        try {
+          final orders = snapshot.docs
+              .map((doc) => OrderModel.fromSnapshot(doc))
+              .toList();
+          orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          yield Result.success(orders);
+        } catch (error) {
+          yield Result<List<OrderModel>>.error(
+            ResultStatus.serverError,
+            'Failed to parse order data',
+          );
+        }
       }
-    }).handleError((e) {
-      if (e is FirebaseException) {
-        return ErrorMapper.fromFirestore<List<OrderModel>>(e);
-      }
-      return ErrorMapper.fromGeneric<List<OrderModel>>(e);
-    });
+    } on FirebaseException catch (error) {
+      yield ErrorMapper.fromFirestore<List<OrderModel>>(error);
+    } catch (error) {
+      yield ErrorMapper.fromGeneric<List<OrderModel>>(error);
+    }
   }
 
   Future<Result<void>> updateOrderStatus(String orderId, String status) async {
     try {
-      await _db
-          .collection(AppConstants.ordersCollection)
-          .doc(orderId)
-          .update({'status': status});
+      await _db.collection(AppConstants.ordersCollection).doc(orderId).update({
+        'status': status,
+      });
       return Result.success(null);
     } on FirebaseAuthException catch (e) {
       return ErrorMapper.fromAuth(e);

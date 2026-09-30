@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "build:web": "flutter build web --release --no-web-resources-cdn",
+    "serve:web": "node scripts/serve_web.mjs",
+    "test:e2e": "npm run build:web && playwright test --project=ci",
+    "test:e2e:live-smoke": "npm run build:web && cross-env LIVE_SMOKE=1 playwright test --project=live-smoke",
+    "test:e2e:report": "playwright show-report playwright-report",
+    "audit:covers": "node scripts/audit_cover_urls.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "cross-env": "^10.1.0",
+    "firebase-admin": "^14.4.0"
+  }
+}

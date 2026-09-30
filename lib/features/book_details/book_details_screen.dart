@@ -102,8 +102,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                         ),
                         onPressed: () async {
                           Haptics.medium();
-                          final result =
-                              await wishlist.toggleWishlist(widget.book.id);
+                          final result = await wishlist.toggleWishlist(
+                            widget.book.id,
+                          );
                           if (!result.isSuccess && context.mounted) {
                             ErrorPresenter.show(context, result);
                           }
@@ -236,28 +237,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                   (r) => r.userId == user.uid,
                 );
                 if (hasReviewed) {
-                  return Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.only(bottom: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.green.shade300),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.check_circle, color: Colors.green, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'You have reviewed this book',
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+                  return const SizedBox.shrink();
                 }
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
@@ -276,9 +256,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                               top: Radius.circular(20),
                             ),
                           ),
-                          builder: (_) => WriteReviewSheet(
-                            bookId: widget.book.id,
-                          ),
+                          builder: (_) =>
+                              WriteReviewSheet(bookId: widget.book.id),
                         );
                       },
                     ),
@@ -345,10 +324,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                   children: provider.reviews.map((review) {
                     final avatarUrl = provider.userAvatars[review.userId] ?? '';
                     return ListTile(
-                      leading: UserAvatar(
-                        photoUrl: avatarUrl,
-                        radius: 20,
-                      ),
+                      leading: UserAvatar(photoUrl: avatarUrl, radius: 20),
                       title: Text(
                         review.userName,
                         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -390,15 +366,27 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
             const SizedBox(height: 32),
 
             PrimaryButton(
-              text: 'Add to Cart',
+              text: widget.book.stock > 0 ? 'Add to Cart' : 'Out of Stock',
               icon: Icons.shopping_bag_outlined,
-              onPressed: () {
-                context.read<CartProvider>().addToCart(widget.book);
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Added to Cart")),
-                );
-              },
+              onPressed: widget.book.stock > 0
+                  ? () async {
+                      final added = await context
+                          .read<CartProvider>()
+                          .addToCart(widget.book);
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context)
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              added
+                                  ? 'Added to Cart'
+                                  : 'No more copies are available.',
+                            ),
+                          ),
+                        );
+                    }
+                  : null,
             ),
           ],
         ),

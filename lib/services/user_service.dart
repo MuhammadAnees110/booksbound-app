@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:booksbound_app/constants/app_constants.dart';
 import 'package:booksbound_app/utils/error_mapper.dart';
 import 'package:booksbound_app/utils/result.dart';
@@ -53,12 +51,12 @@ class ProfileService {
       );
       if (image == null) return Result.noContent('No image selected');
 
-      final imageFile = File(image.path);
       final storageRef = _storage.ref().child(
         'profile_pictures/${currentUser.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg',
       );
-      final uploadTask = await storageRef.putFile(
-        imageFile,
+      final bytes = await image.readAsBytes();
+      final uploadTask = await storageRef.putData(
+        bytes,
         SettableMetadata(contentType: 'image/jpeg'),
       );
       final imageUrl = await uploadTask.ref.getDownloadURL();
@@ -189,15 +187,8 @@ class ProfileService {
           .collection(AppConstants.usersCollection)
           .doc(currentUser.uid)
           .delete();
-      if (AppConstants.usersCollection != 'users') {
-        try {
-          await _firestore.collection('users').doc(currentUser.uid).delete();
-        } catch (_) {
-          // Ignore if collection doesn't exist
-        }
-      }
 
-      // 7. Delete Firebase Auth account
+      // 6. Delete Firebase Auth account
       await currentUser.delete();
 
       // 8. Log analytics event

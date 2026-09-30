@@ -58,39 +58,56 @@ class _MainLayoutState extends State<MainLayout> {
     onGenerateRoute: AppRoutes.generateRoute,
   );
 
-  List<PersistentBottomNavBarItem> _navBarsItems() => [
+  List<PersistentBottomNavBarItem> _navBarsItems({required bool isDark}) => [
     PersistentBottomNavBarItem(
-      icon: const Icon(Icons.home),
+      icon: Semantics(
+        label: 'Home tab',
+        button: true,
+        child: const Icon(Icons.home),
+      ),
       title: "Home",
-      activeColorPrimary: Colors.black,
-      inactiveColorPrimary: Colors.grey,
+      activeColorPrimary: isDark ? Colors.white : Colors.black,
+      inactiveColorPrimary: isDark ? Colors.white70 : Colors.grey,
       routeAndNavigatorSettings: _routeSettings,
     ),
     PersistentBottomNavBarItem(
-      icon: const Icon(Icons.search),
+      icon: Semantics(
+        label: 'Search tab',
+        button: true,
+        child: const Icon(Icons.search),
+      ),
       title: "Search",
-      activeColorPrimary: Colors.black,
-      inactiveColorPrimary: Colors.grey,
+      activeColorPrimary: isDark ? Colors.white : Colors.black,
+      inactiveColorPrimary: isDark ? Colors.white70 : Colors.grey,
       routeAndNavigatorSettings: _routeSettings,
     ),
     PersistentBottomNavBarItem(
-      icon: const Icon(Icons.shopping_cart),
+      icon: Semantics(
+        label: 'Cart tab',
+        button: true,
+        child: const Icon(Icons.shopping_cart),
+      ),
       title: "Cart",
-      activeColorPrimary: Colors.black,
-      inactiveColorPrimary: Colors.grey,
+      activeColorPrimary: isDark ? Colors.white : Colors.black,
+      inactiveColorPrimary: isDark ? Colors.white70 : Colors.grey,
       routeAndNavigatorSettings: _routeSettings,
     ),
     PersistentBottomNavBarItem(
-      icon: const Icon(Icons.person),
+      icon: Semantics(
+        label: 'Profile tab',
+        button: true,
+        child: const Icon(Icons.person),
+      ),
       title: "Profile",
-      activeColorPrimary: Colors.black,
-      inactiveColorPrimary: Colors.grey,
+      activeColorPrimary: isDark ? Colors.white : Colors.black,
+      inactiveColorPrimary: isDark ? Colors.white70 : Colors.grey,
       routeAndNavigatorSettings: _routeSettings,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
@@ -144,7 +161,8 @@ class _MainLayoutState extends State<MainLayout> {
                       settings: const RouteSettings(name: appRoutes.adminPanel),
                       screen: const AdminPanelScreen(),
                       withNavBar: true,
-                      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                      pageTransitionAnimation:
+                          PageTransitionAnimation.cupertino,
                     );
                   },
                   icon: const Icon(Icons.dashboard),
@@ -164,7 +182,7 @@ class _MainLayoutState extends State<MainLayout> {
               context,
               controller: _controller,
               screens: _buildScreens(),
-              items: _navBarsItems(),
+              items: _navBarsItems(isDark: isDark),
               selectedTabScreenContext: (context) {
                 _tabContext = context;
               },
@@ -172,7 +190,7 @@ class _MainLayoutState extends State<MainLayout> {
                 Haptics.light();
               },
               confineToSafeArea: true,
-              backgroundColor: Theme.of(context).brightness == Brightness.dark
+              backgroundColor: isDark
                   ? const Color(0xEE1C1C1E)
                   : const Color(0xEEFFFFFF),
               handleAndroidBackButtonPress: true,
@@ -182,7 +200,8 @@ class _MainLayoutState extends State<MainLayout> {
                   duration: Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                   animateTabTransition: true,
-                  screenTransitionAnimationType: ScreenTransitionAnimationType.slide,
+                  screenTransitionAnimationType:
+                      ScreenTransitionAnimationType.slide,
                 ),
               ),
               navBarStyle: NavBarStyle.neumorphic,

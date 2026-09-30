@@ -9,6 +9,7 @@ class Book {
   final String description;
   final String coverUrl;
   final double price;
+  final int stock;
   final bool isBestseller;
   final DateTime releaseDate;
   final String isbn;
@@ -23,6 +24,7 @@ class Book {
     required this.description,
     required this.coverUrl,
     required this.price,
+    this.stock = 20,
     required this.isBestseller,
     required this.releaseDate,
     required this.isbn,
@@ -54,6 +56,7 @@ class Book {
       coverUrl: (data['coverUrl'] as String?) ?? '',
       isbn: data['isbn'] ?? '',
       price: (data['price'] as num?)?.toDouble() ?? 0.0,
+      stock: (data['stock'] as num?)?.toInt() ?? 20,
       rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
       isBestseller: data['isBestseller'] ?? false,
       releaseDate: parsedDate,
@@ -74,6 +77,7 @@ class Book {
       'description': description,
       'coverUrl': coverUrl,
       'price': price,
+      'stock': stock,
       'isBestseller': isBestseller,
       'releaseDate': Timestamp.fromDate(releaseDate),
       'isbn': isbn,

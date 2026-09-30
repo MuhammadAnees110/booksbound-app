@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/services/books_service.dart';
 import 'package:booksbound_app/utils/result.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 enum SortType { priceLow, priceHigh, newest, popularity }
 
@@ -20,8 +19,9 @@ class BookProvider extends ChangeNotifier {
   List<Book> get bestsellers => _books.where((b) => b.isBestseller).toList();
   List<Book> get newArrivals => _books
       .where(
-        (b) =>
-            b.releaseDate.isAfter(DateTime.now().subtract(const Duration(days: 365))),
+        (b) => b.releaseDate.isAfter(
+          DateTime.now().subtract(const Duration(days: 365)),
+        ),
       )
       .toList();
 
@@ -43,13 +43,15 @@ class BookProvider extends ChangeNotifier {
   }
 
   List<Book> search(String query) {
+    final normalizedQuery = query.trim().toLowerCase();
+    if (normalizedQuery.isEmpty) return _books;
+
     return _books
         .where(
           (b) =>
-              b.title.toLowerCase().contains(query.toLowerCase()) ||
-              b.author.toLowerCase().contains(query.toLowerCase()) ||
-              b.genre.toLowerCase().contains(query.toLowerCase()) ||
-              b.isbn.contains(query),
+              b.title.toLowerCase().contains(normalizedQuery) ||
+              b.author.toLowerCase().contains(normalizedQuery) ||
+              b.genre.toLowerCase().startsWith(normalizedQuery),
         )
         .toList();
   }
@@ -108,7 +110,7 @@ class BookProvider extends ChangeNotifier {
     return result;
   }
 
-  Future<Result<String>> addBook(Book book, {File? imageFile}) async {
+  Future<Result<String>> addBook(Book book, {XFile? imageFile}) async {
     _isloading = true;
     _error = '';
     notifyListeners();
@@ -126,12 +128,20 @@ class BookProvider extends ChangeNotifier {
     return result;
   }
 
-  Future<Result<void>> updateBook(String bookId, Book book, {File? imageFile}) async {
+  Future<Result<void>> updateBook(
+    String bookId,
+    Book book, {
+    XFile? imageFile,
+  }) async {
     _isloading = true;
     _error = '';
     notifyListeners();
 
-    final result = await _service.updateBook(bookId, book, imageFile: imageFile);
+    final result = await _service.updateBook(
+      bookId,
+      book,
+      imageFile: imageFile,
+    );
     if (result.isSuccess) {
       final index = _books.indexWhere((b) => b.id == bookId);
       if (index != -1) {

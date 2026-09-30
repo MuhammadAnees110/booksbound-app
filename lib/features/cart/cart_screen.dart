@@ -74,7 +74,10 @@ class CartScreen extends StatelessWidget {
                             AnimatedSwitcher(
                               duration: const Duration(milliseconds: 200),
                               transitionBuilder: (child, animation) =>
-                                  ScaleTransition(scale: animation, child: child),
+                                  ScaleTransition(
+                                    scale: animation,
+                                    child: child,
+                                  ),
                               child: Text(
                                 '${item.quantity}',
                                 key: ValueKey<int>(item.quantity),
@@ -86,11 +89,26 @@ class CartScreen extends StatelessWidget {
                             ),
                             IconButton(
                               icon: const Icon(Icons.add_circle_outline),
-                              tooltip: 'Increase quantity',
-                              onPressed: () {
-                                Haptics.light();
-                                cart.increaseQuantity(item.book.id);
-                              },
+                              tooltip: item.quantity >= item.book.stock
+                                  ? 'Maximum stock reached'
+                                  : 'Increase quantity',
+                              onPressed: item.quantity >= item.book.stock
+                                  ? null
+                                  : () {
+                                      Haptics.light();
+                                      if (cart.increaseQuantity(item.book.id) &&
+                                          item.quantity >= item.book.stock) {
+                                        ScaffoldMessenger.of(context)
+                                          ..hideCurrentSnackBar()
+                                          ..showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Maximum stock reached for ${item.book.title}.',
+                                              ),
+                                            ),
+                                          );
+                                      }
+                                    },
                             ),
                             const SizedBox(width: 8),
                             Text(
@@ -119,7 +137,7 @@ class CartScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.05),
@@ -176,8 +194,10 @@ class CartScreen extends StatelessWidget {
                                   itemCount: cart.itemsCount,
                                 );
                                 if (!context.mounted) return;
-                                Navigator.of(context, rootNavigator: true)
-                                    .pushNamed(AppRoutes.checkout);
+                                Navigator.of(
+                                  context,
+                                  rootNavigator: true,
+                                ).pushNamed(AppRoutes.checkout);
                               },
                       ),
                     ],

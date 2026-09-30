@@ -28,6 +28,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  Stream<Result<List<OrderModel>>>? _ordersStream;
+
   @override
   void initState() {
     super.initState();
@@ -37,15 +39,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  void _initOrdersStream(String uid) {
+    _ordersStream ??= OrderService().getUserOrders(uid);
+  }
+
   Future<void> _openUrl(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open link')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Could not open link')));
     }
   }
 
@@ -104,8 +110,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         button: true,
                         child: GestureDetector(
                           onTap: () async {
-                            final result =
-                                await provider.changeProfilePicture();
+                            final result = await provider
+                                .changeProfilePicture();
                             if (!result.isSuccess && context.mounted) {
                               ErrorPresenter.show(context, result);
                             }
@@ -154,14 +160,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         icon: Icons.edit,
                         title: "Edit Profile",
                         onTap: () {
-                          Navigator.of(context).pushNamed(appRoutes.editProfile);
+                          Navigator.of(
+                            context,
+                          ).pushNamed(appRoutes.editProfile);
                         },
                       ),
                       _profileTile(
                         icon: Icons.lock,
                         title: "Change Password",
                         onTap: () {
-                          Navigator.of(context).pushNamed(appRoutes.changePassword);
+                          Navigator.of(
+                            context,
+                          ).pushNamed(appRoutes.changePassword);
                         },
                       ),
                       _profileTile(
@@ -170,12 +180,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onTap: () {
                           final uid =
                               context.read<UserAuthProvider>().user?.uid ?? '';
+                          _initOrdersStream(uid);
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
                             shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.vertical(top: Radius.circular(20)),
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(20),
+                              ),
                             ),
                             builder: (_) => DraggableScrollableSheet(
                               expand: false,
@@ -195,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   Expanded(
                                     child: StreamBuilder<Result<List<OrderModel>>>(
-                                      stream: OrderService().getUserOrders(uid),
+                                      stream: _ordersStream,
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
@@ -206,29 +218,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 const SizedBox(height: 8),
                                             itemBuilder: (_, _) =>
                                                 const Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 16.0,
-                                                  vertical: 8.0),
-                                              child: Skeleton(
-                                                width: double.infinity,
-                                                height: 50,
-                                                radius: 8,
-                                              ),
-                                            ),
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 16.0,
+                                                    vertical: 8.0,
+                                                  ),
+                                                  child: Skeleton(
+                                                    width: double.infinity,
+                                                    height: 50,
+                                                    radius: 8,
+                                                  ),
+                                                ),
                                           );
                                         }
                                         final result = snapshot.data;
-                                        if (result == null ||
-                                            !result.isSuccess ||
-                                            result.data!.isEmpty) {
+                                        if (snapshot.hasError ||
+                                            result == null) {
                                           return const EmptyState(
                                             icon: Icons.inventory_2_outlined,
-                                            title: "No orders yet",
-                                            subtitle:
-                                                "Your purchase history will appear here",
+                                            title: 'Unable to load orders',
+                                            subtitle: 'Please try again later',
                                           );
                                         }
-                                        final orders = result.data!;
+                                        if (!result.isSuccess) {
+                                          return EmptyState(
+                                            icon: Icons.error_outline,
+                                            title: 'Unable to load orders',
+                                            subtitle: result.message,
+                                          );
+                                        }
+                                        final orders = result.data ?? [];
+                                        if (orders.isEmpty) {
+                                          return const EmptyState(
+                                            icon: Icons.inventory_2_outlined,
+                                            title: 'No past orders found',
+                                            subtitle:
+                                                'Your purchase history will appear here',
+                                          );
+                                        }
                                         return ListView.separated(
                                           controller: scrollController,
                                           itemCount: orders.length,
@@ -238,25 +264,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             final order = orders[index];
                                             return ListTile(
                                               leading: const Icon(
-                                                  Icons.receipt_long_outlined),
+                                                Icons.receipt_long_outlined,
+                                              ),
                                               title: Text(
                                                 '${order.items.length} item(s) — ${Formatters.formatCurrency(order.totalAmount)}',
                                               ),
                                               subtitle: Text(
                                                 Formatters.formatDate(
-                                                    order.createdAt),
+                                                  order.createdAt,
+                                                ),
                                               ),
                                               trailing: Chip(
                                                 label: Text(
-                                                  order.status
-                                                      .toUpperCase(),
+                                                  order.status.toUpperCase(),
                                                   style: const TextStyle(
-                                                      fontSize: 10),
+                                                    fontSize: 10,
+                                                  ),
                                                 ),
                                                 backgroundColor:
                                                     order.status == 'delivered'
-                                                        ? Colors.green[100]
-                                                        : Colors.orange[100],
+                                                    ? Colors.green[100]
+                                                    : Colors.orange[100],
                                               ),
                                             );
                                           },
@@ -277,12 +305,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               duration: const Duration(milliseconds: 350),
                               transitionBuilder: (child, anim) =>
                                   RotationTransition(
-                                turns: anim,
-                                child: FadeTransition(
-                                  opacity: anim,
-                                  child: child,
-                                ),
-                              ),
+                                    turns: anim,
+                                    child: FadeTransition(
+                                      opacity: anim,
+                                      child: child,
+                                    ),
+                                  ),
                               child: Icon(
                                 themeProvider.isDarkMode
                                     ? Icons.dark_mode
@@ -290,7 +318,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 key: ValueKey(themeProvider.isDarkMode),
                               ),
                             ),
-                            title: const Text("Dark Mode"),
+                            title: Text(
+                              themeProvider.isDarkMode
+                                  ? "Dark Mode"
+                                  : "Light Mode",
+                            ),
                             trailing: Switch(
                               value: themeProvider.isDarkMode,
                               onChanged: (_) {
@@ -321,14 +353,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         title: const Text("Privacy Policy"),
                         trailing: const Icon(Icons.open_in_new, size: 16),
                         onTap: () => _openUrl(
-                            'https://muhammadanees.github.io/booksbound-legal/privacy_policy.html'),
+                          'https://muhammadanees.github.io/booksbound-legal/privacy_policy.html',
+                        ),
                       ),
                       ListTile(
                         leading: const Icon(Icons.description_outlined),
                         title: const Text("Terms of Service"),
                         trailing: const Icon(Icons.open_in_new, size: 16),
                         onTap: () => _openUrl(
-                            'https://muhammadanees.github.io/booksbound-legal/terms_of_service.html'),
+                          'https://muhammadanees.github.io/booksbound-legal/terms_of_service.html',
+                        ),
                       ),
 
                       // ── Account Actions ───────────────────────────────────
@@ -342,6 +376,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             rootNavigator: true,
                           );
 
+                          final logoutResult = await context
+                              .read<UserAuthProvider>()
+                              .logout();
+                          if (!context.mounted) return;
+                          if (!logoutResult.isSuccess) {
+                            ErrorPresenter.show(context, logoutResult);
+                            return;
+                          }
+
+                          await context.read<ThemeProvider>().setTheme(
+                            ThemeMode.light,
+                          );
+                          if (!context.mounted) return;
+
                           // Clear local UI providers synchronously using context
                           context.read<ProfileProvider>().clear();
                           context.read<BookProvider>().clear();
@@ -350,27 +398,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           context.read<ReviewsProvider>().clear();
                           context.read<WishlistProvider>().clear();
 
-                          // Perform logout without passing context
-                          await context.read<UserAuthProvider>().logout();
-
-                          if (!mounted) return;
-
                           navigator.pushReplacementNamed(appRoutes.login);
                         },
                       ),
 
                       // Delete Account (red)
                       ListTile(
-                        leading: const Icon(Icons.delete_forever,
-                            color: Colors.red),
+                        leading: const Icon(
+                          Icons.delete_forever,
+                          color: Colors.red,
+                        ),
                         title: const Text(
                           "Delete Account",
                           style: TextStyle(color: Colors.red),
                         ),
-                        trailing: const Icon(Icons.arrow_forward_ios,
-                            size: 16, color: Colors.red),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                          color: Colors.red,
+                        ),
                         onTap: () async {
-                          final nav = Navigator.of(context, rootNavigator: true);
+                          final nav = Navigator.of(
+                            context,
+                            rootNavigator: true,
+                          );
                           final confirmed = await showDialog<bool>(
                             context: context,
                             builder: (ctx) => AlertDialog(
@@ -380,15 +431,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               actions: [
                                 TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(ctx).pop(false),
+                                  onPressed: () => Navigator.of(ctx).pop(false),
                                   child: const Text('Cancel'),
                                 ),
                                 TextButton(
                                   style: TextButton.styleFrom(
-                                      foregroundColor: Colors.red),
-                                  onPressed: () =>
-                                      Navigator.of(ctx).pop(true),
+                                    foregroundColor: Colors.red,
+                                  ),
+                                  onPressed: () => Navigator.of(ctx).pop(true),
                                   child: const Text('Delete Account'),
                                 ),
                               ],

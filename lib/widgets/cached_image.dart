@@ -11,7 +11,6 @@ class CachedImage extends StatelessWidget {
   final double? height;
   final BoxFit fit;
   final double borderRadius;
-  final String fallbackAsset;
 
   const CachedImage({
     super.key,
@@ -20,7 +19,6 @@ class CachedImage extends StatelessWidget {
     this.height,
     this.fit = BoxFit.cover,
     this.borderRadius = 0.0,
-    this.fallbackAsset = 'assets/images/cover-error.png',
   });
 
   @override
@@ -39,8 +37,12 @@ class CachedImage extends StatelessWidget {
         fit: fit,
         fadeInDuration: const Duration(milliseconds: 200),
         fadeOutDuration: const Duration(milliseconds: 150),
-        memCacheWidth: width != null ? (width! * 2.5).toInt() : null,
-        memCacheHeight: height != null ? (height! * 2.5).toInt() : null,
+        memCacheWidth: width != null && width!.isFinite
+            ? (width! * 2.5).toInt()
+            : null,
+        memCacheHeight: height != null && height!.isFinite
+            ? (height! * 2.5).toInt()
+            : null,
         placeholder: (context, url) =>
             Skeleton(width: width, height: height, radius: borderRadius),
         errorWidget: (context, url, error) {
@@ -80,17 +82,12 @@ class CachedImage extends StatelessWidget {
   }
 
   Widget _buildErrorWidget() {
-    Widget errorContent = Image.asset(
-      fallbackAsset,
+    Widget errorContent = Container(
       width: width,
       height: height,
-      fit: fit,
-      errorBuilder: (_, _, _) => Container(
-        width: width,
-        height: height,
-        color: Colors.grey.shade300,
-        child: const Icon(Icons.book, size: 60, color: Colors.grey),
-      ),
+      alignment: Alignment.center,
+      color: Colors.grey.shade200,
+      child: const Icon(Icons.menu_book, color: Colors.grey),
     );
 
     if (borderRadius > 0) {

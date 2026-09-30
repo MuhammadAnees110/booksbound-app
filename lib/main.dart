@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:booksbound_app/core/theme/app_theme.dart';
+import 'package:flutter/foundation.dart';
 import 'package:booksbound_app/features/admin/analytics/providers/admin_analytics_provider.dart';
 import 'package:booksbound_app/features/admin/manage_users/providers/admin_users_provider.dart';
 import 'package:booksbound_app/models/book_model.dart';
@@ -24,6 +25,18 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Catch all Flutter framework errors and log them to the console.
+  // Wire to Crashlytics here when you add firebase_crashlytics.
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint('FlutterError: ${details.exceptionAsString()}');
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint('PlatformDispatcher error: $error\n$stack');
+    return true;
+  };
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   try {
@@ -37,8 +50,12 @@ void main() async {
 
   try {
     await FirebaseAppCheck.instance.activate(
-      providerAndroid: const AndroidPlayIntegrityProvider(),
-      providerApple: const AppleAppAttestWithDeviceCheckFallbackProvider(),
+      providerAndroid: kDebugMode
+          ? const AndroidDebugProvider()
+          : const AndroidPlayIntegrityProvider(),
+      providerApple: kDebugMode
+          ? const AppleDebugProvider()
+          : const AppleAppAttestWithDeviceCheckFallbackProvider(),
     );
   } catch (e) {
     // Log but don't crash — App Check may not be configured in console yet
@@ -47,14 +64,16 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
   final savedTheme = prefs.getString('themeMode');
-  ThemeMode initialTheme = ThemeMode.system;
+  ThemeMode initialTheme = ThemeMode.light;
   if (savedTheme == 'dark') initialTheme = ThemeMode.dark;
   if (savedTheme == 'light') initialTheme = ThemeMode.light;
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider(initialTheme: initialTheme)),
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(initialTheme: initialTheme),
+        ),
         ChangeNotifierProvider(create: (_) => BookProvider()),
         ChangeNotifierProvider(create: (_) => UserAuthProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),

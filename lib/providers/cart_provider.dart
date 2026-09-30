@@ -20,11 +20,20 @@ class CartProvider extends ChangeNotifier {
 
   double get totalPrice => totalAmount;
 
-  Future<void> addToCart(Book book, [int quantity = 1]) async {
-    if (_items.containsKey(book.id)) {
-      _items[book.id]!.quantity += quantity;
+  Future<bool> addToCart(Book book, [int quantity = 1]) async {
+    final existingItem = _items[book.id];
+    final stock = existingItem?.book.stock ?? book.stock;
+    final currentQuantity = existingItem?.quantity ?? 0;
+    final availableQuantity = stock - currentQuantity;
+    if (quantity <= 0 || availableQuantity <= 0) return false;
+
+    final quantityToAdd = quantity < availableQuantity
+        ? quantity
+        : availableQuantity;
+    if (existingItem != null) {
+      existingItem.quantity += quantityToAdd;
     } else {
-      _items[book.id] = CartItem(book: book, quantity: quantity);
+      _items[book.id] = CartItem(book: book, quantity: quantityToAdd);
     }
     notifyListeners();
 
@@ -32,8 +41,9 @@ class CartProvider extends ChangeNotifier {
       bookId: book.id,
       title: book.title,
       price: book.price,
-      quantity: quantity,
+      quantity: quantityToAdd,
     );
+    return true;
   }
 
   void removeItem(String bookId) {
@@ -46,10 +56,12 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void increaseQuantity(String bookId) {
-    if (!_items.containsKey(bookId)) return;
-    _items[bookId]!.quantity += 1;
+  bool increaseQuantity(String bookId) {
+    final item = _items[bookId];
+    if (item == null || item.quantity >= item.book.stock) return false;
+    item.quantity += 1;
     notifyListeners();
+    return true;
   }
 
   void decreaseQuantity(String bookId) {

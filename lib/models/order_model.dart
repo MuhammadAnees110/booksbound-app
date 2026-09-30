@@ -37,12 +37,20 @@ class OrderModel {
       id: doc.id,
       userId: data['userId'] ?? '',
       items: (data['items'] as List<dynamic>? ?? [])
-          .map((item) => CartItemModel.fromMap(item as Map<String, dynamic>))
+          .whereType<Map<String, dynamic>>()
+          .map(CartItemModel.fromMap)
           .toList(),
       totalAmount: (data['totalAmount'] as num?)?.toDouble() ?? 0.0,
       shippingAddress: data['shippingAddress'] ?? '',
       status: data['status'] ?? 'Pending',
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: _parseCreatedAt(data['createdAt']),
     );
+  }
+
+  static DateTime _parseCreatedAt(Object? value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+    return DateTime.now();
   }
 }

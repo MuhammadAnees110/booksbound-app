@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:booksbound_app/constants/app_constants.dart';
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/utils/error_mapper.dart';
@@ -8,6 +5,7 @@ import 'package:booksbound_app/utils/result.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 
 class BooksService {
   static const int _defaultPageSize = 20;
@@ -15,25 +13,27 @@ class BooksService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  // Fetch books in fixed-size pages to avoid unbounded reads.
+  // Fetch books in fixed-size pages so the local catalog contains every book.
   Future<Result<List<Book>>> fetchBooks({
     DocumentSnapshot<Map<String, dynamic>>? lastDoc,
     int pageSize = _defaultPageSize,
   }) async {
     try {
-      Query<Map<String, dynamic>> query = _firestore
-          .collection(AppConstants.booksCollection)
-          .limit(pageSize);
+      final books = <Book>[];
+      var cursor = lastDoc;
 
-      if (lastDoc != null) {
-        query = query.startAfterDocument(lastDoc);
+      while (true) {
+        Query<Map<String, dynamic>> query = _firestore
+            .collection(AppConstants.booksCollection)
+            .limit(pageSize);
+        if (cursor != null) query = query.startAfterDocument(cursor);
+
+        final snapshot = await query.get();
+        books.addAll(snapshot.docs.map(Book.fromJson));
+        if (snapshot.docs.length < pageSize) break;
+        cursor = snapshot.docs.last;
       }
 
-      final snapshot = await query.get();
-
-      final books = snapshot.docs.map((doc) {
-        return Book.fromJson(doc);
-      }).toList();
       return Result.success(books);
     } on FirebaseAuthException catch (e) {
       return ErrorMapper.fromAuth(e);
@@ -65,7 +65,7 @@ class BooksService {
   }
 
   // Add new book
-  Future<Result<String>> addBook(Book book, {File? imageFile}) async {
+  Future<Result<String>> addBook(Book book, {XFile? imageFile}) async {
     try {
       final bookData = book.toMap();
 
@@ -91,7 +91,7 @@ class BooksService {
   Future<Result<void>> updateBook(
     String bookId,
     Book book, {
-    File? imageFile,
+    XFile? imageFile,
   }) async {
     try {
       final updateData = book.toMap();
@@ -225,18 +225,16 @@ class BooksService {
   }
 
   /// Uploads [imageFile] to Firebase Storage and returns the public download URL.
-  /// If Firebase Storage is unavailable (e.g. Spark free tier), falls back to Base64.
-  Future<String> _uploadBookImage(File imageFile, String bookId) async {
-    try {
-      final fileName =
-          'book_covers/${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final ref = _storage.ref().child(fileName);
-      final snapshot = await ref.putFile(imageFile);
-      return await snapshot.ref.getDownloadURL();
-    } catch (_) {
-      // Graceful fallback to Base64 when Storage is disabled on free tier
-      final bytes = await imageFile.readAsBytes();
-      return base64Encode(bytes);
-    }
+  /// Uses [XFile.readAsBytes] + [putData] so it works on both mobile and web.
+  Future<String> _uploadBookImage(XFile imageFile, String bookId) async {
+    final fileName =
+        'book_covers/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final ref = _storage.ref().child(fileName);
+    final bytes = await imageFile.readAsBytes();
+    final snapshot = await ref.putData(
+      bytes,
+      SettableMetadata(contentType: 'image/jpeg'),
+    );
+    return await snapshot.ref.getDownloadURL();
   }
 }
