@@ -15,10 +15,13 @@ class CategoryModel {
     return CategoryModel(
       id: id ?? map['id'] ?? '',
       name: map['name'] ?? '',
-      imageUrl: map['imageUrl'] ?? '',
+      imageUrl: (map['imageUrl'] as String?) ?? '',
       description: map['description'] ?? '',
     );
   }
+
+  factory CategoryModel.fromJson(Map<String, dynamic> json, {String? id}) =>
+      CategoryModel.fromMap(json, id: id);
 
   Map<String, dynamic> toJson() {
     return {

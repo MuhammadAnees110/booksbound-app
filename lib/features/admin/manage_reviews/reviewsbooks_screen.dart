@@ -3,6 +3,7 @@ import 'package:booksbound_app/providers/book_provider.dart';
 import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/widgets/ratings.dart';
+import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -95,24 +96,11 @@ class _ReviewsbooksScreenState extends State<ReviewsbooksScreen> {
                         Expanded(
                           child: Stack(
                             children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  book.coverUrl,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, _, _) {
-                                    return Image.asset(
-                                      'assets/images/cover-error.png',
-                                      fit: BoxFit.fitWidth,
-                                      errorBuilder: (ctx, e, _) => const Icon(
-                                        Icons.book,
-                                        size: 60,
-                                        color: Colors.grey,
-                                      ),
-                                    );
-                                  },
-                                ),
+                              CachedImage(
+                                imageUrl: book.coverUrl,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                borderRadius: 12,
                               ),
                             ],
                           ),

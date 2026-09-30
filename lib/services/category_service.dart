@@ -13,56 +13,56 @@ class CategoryService {
       id: 'fiction',
       name: 'Fiction',
       imageUrl:
-          'https://images.unsplash.com/photo-1476275466078-4007374efbbe?w=400',
+          'https://cdn.jsdelivr.net/gh/chotabahi/book-app-assets@main/categories/fiction.jpg',
       description: 'Novels, drama, and imaginative literature',
     ),
     CategoryModel(
       id: 'non-fiction',
       name: 'Non-Fiction',
       imageUrl:
-          'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400',
+          'https://cdn.jsdelivr.net/gh/chotabahi/book-app-assets@main/categories/non-fiction.jpg',
       description: 'Real-world facts, essays, and analysis',
     ),
     CategoryModel(
       id: 'children',
       name: 'Children',
       imageUrl:
-          'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400',
+          'https://cdn.jsdelivr.net/gh/chotabahi/book-app-assets@main/categories/children.jpg',
       description: 'Picture books, fairy tales, and early readers',
     ),
     CategoryModel(
       id: 'academic',
       name: 'Academic',
       imageUrl:
-          'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=400',
+          'https://cdn.jsdelivr.net/gh/chotabahi/book-app-assets@main/categories/academic.jpg',
       description: 'Textbooks, research, and educational resources',
     ),
     CategoryModel(
       id: 'science',
       name: 'Science',
       imageUrl:
-          'https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=400',
+          'https://cdn.jsdelivr.net/gh/chotabahi/book-app-assets@main/categories/science.jpg',
       description: 'Physics, chemistry, biology, and the cosmos',
     ),
     CategoryModel(
       id: 'history',
       name: 'History',
       imageUrl:
-          'https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=400',
+          'https://cdn.jsdelivr.net/gh/chotabahi/book-app-assets@main/categories/history.jpg',
       description: 'Historical events, civilizations, and narratives',
     ),
     CategoryModel(
       id: 'biography',
       name: 'Biography',
       imageUrl:
-          'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400',
+          'https://cdn.jsdelivr.net/gh/chotabahi/book-app-assets@main/categories/biography.jpg',
       description: 'Memoirs and lives of extraordinary figures',
     ),
     CategoryModel(
       id: 'religion',
       name: 'Religion',
       imageUrl:
-          'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=400',
+          'https://cdn.jsdelivr.net/gh/chotabahi/book-app-assets@main/categories/religion.jpg',
       description: 'Spiritual guides, theology, and philosophy',
     ),
   ];
@@ -72,24 +72,27 @@ class CategoryService {
         .collection(AppConstants.categoriesCollection)
         .snapshots()
         .map((snapshot) {
-      try {
-        if (snapshot.docs.isEmpty) {
-          return Result.success(defaultCategories);
-        }
-        final cats = snapshot.docs.map((doc) {
-          return CategoryModel.fromMap(doc.data(), id: doc.id);
-        }).toList();
-        return Result.success(cats);
-      } catch (e) {
-        return Result<List<CategoryModel>>.error(
-            ResultStatus.serverError, 'Failed to parse categories');
-      }
-    }).handleError((e) {
-      if (e is FirebaseException) {
-        return ErrorMapper.fromFirestore<List<CategoryModel>>(e);
-      }
-      return ErrorMapper.fromGeneric<List<CategoryModel>>(e);
-    });
+          try {
+            if (snapshot.docs.isEmpty) {
+              return Result.success(defaultCategories);
+            }
+            final cats = snapshot.docs.map((doc) {
+              return CategoryModel.fromMap(doc.data(), id: doc.id);
+            }).toList();
+            return Result.success(cats);
+          } catch (e) {
+            return Result<List<CategoryModel>>.error(
+              ResultStatus.serverError,
+              'Failed to parse categories',
+            );
+          }
+        })
+        .handleError((e) {
+          if (e is FirebaseException) {
+            return ErrorMapper.fromFirestore<List<CategoryModel>>(e);
+          }
+          return ErrorMapper.fromGeneric<List<CategoryModel>>(e);
+        });
   }
 
   Future<Result<CategoryModel?>> getCategoryById(String id) async {
@@ -103,7 +106,8 @@ class CategoryService {
       }
       try {
         return Result.success(
-            defaultCategories.firstWhere((cat) => cat.id == id));
+          defaultCategories.firstWhere((cat) => cat.id == id),
+        );
       } catch (_) {
         return Result.error(ResultStatus.notFound, 'Category not found');
       }

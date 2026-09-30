@@ -41,17 +41,18 @@ class CachedImage extends StatelessWidget {
         fadeOutDuration: const Duration(milliseconds: 150),
         memCacheWidth: width != null ? (width! * 2.5).toInt() : null,
         memCacheHeight: height != null ? (height! * 2.5).toInt() : null,
-        placeholder: (context, url) => Skeleton(
-          width: width,
-          height: height,
-          radius: borderRadius,
-        ),
-        errorWidget: (context, url, error) => _buildErrorWidget(),
+        placeholder: (context, url) =>
+            Skeleton(width: width, height: height, radius: borderRadius),
+        errorWidget: (context, url, error) {
+          debugPrint('Failed to load image from URL: $url | Error: $error');
+          return _buildErrorWidget();
+        },
       );
     } else {
       try {
-        final cleanBase64 =
-            trimmed.contains(',') ? trimmed.split(',').last : trimmed;
+        final cleanBase64 = trimmed.contains(',')
+            ? trimmed.split(',').last
+            : trimmed;
         final Uint8List bytes = base64Decode(cleanBase64);
         content = Image.memory(
           bytes,
@@ -60,7 +61,10 @@ class CachedImage extends StatelessWidget {
           fit: fit,
           errorBuilder: (_, _, _) => _buildErrorWidget(),
         );
-      } catch (_) {
+      } catch (error) {
+        debugPrint(
+          'Failed to decode image data from URL: $trimmed | Error: $error',
+        );
         content = _buildErrorWidget();
       }
     }

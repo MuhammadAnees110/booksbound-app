@@ -4,6 +4,7 @@ import 'package:booksbound_app/providers/book_provider.dart';
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/utils/formatters.dart';
 import 'package:booksbound_app/widgets/book_form_dialog.dart';
+import 'package:booksbound_app/widgets/cached_image.dart';
 import 'package:booksbound_app/widgets/error_snackbar.dart';
 
 class ManageBooksScreen extends StatefulWidget {
@@ -111,16 +112,12 @@ class _ManageBooksScreenState extends State<ManageBooksScreen> {
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
       child: ListTile(
         leading: book.coverUrl.isNotEmpty
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Image.network(
-                  book.coverUrl,
-                  width: 50,
-                  height: 70,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) =>
-                      const Icon(Icons.book, size: 40),
-                ),
+            ? CachedImage(
+                imageUrl: book.coverUrl,
+                width: 50,
+                height: 70,
+                fit: BoxFit.cover,
+                borderRadius: 4,
               )
             : const Icon(Icons.book, size: 40),
         title: Text(

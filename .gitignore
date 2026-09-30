@@ -43,6 +43,8 @@ package-lock.json
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 android/key.properties
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
 *.jks
 *.keystore
 booksbound-symbols/

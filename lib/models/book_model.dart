@@ -51,7 +51,7 @@ class Book {
       author: data['author'] ?? '',
       genre: data['genre'] ?? data['category'] ?? '',
       description: data['description'] ?? '',
-      coverUrl: data['coverUrl'] ?? '',
+      coverUrl: (data['coverUrl'] as String?) ?? '',
       isbn: data['isbn'] ?? '',
       price: (data['price'] as num?)?.toDouble() ?? 0.0,
       rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
