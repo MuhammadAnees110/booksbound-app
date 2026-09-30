@@ -6,27 +6,51 @@
  * Uses firebase-admin with the token from firebase-tools.json (no gcloud needed).
  */
 
-const { initializeApp } = require('firebase-admin/app');
+const { initializeApp, cert } = require('firebase-admin/app');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
-// ── Read the stored access_token from firebase-tools ──────────────────────
-const configPath = path.join(os.homedir(), '.config', 'configstore', 'firebase-tools.json');
-let accessToken = null;
-try {
-  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  accessToken = config?.tokens?.access_token || null;
-} catch (_) {}
-
-if (!accessToken) {
-  console.error('❌ Could not read firebase-tools access_token from', configPath);
-  console.error('   Run: firebase login');
-  process.exit(1);
-}
-
 async function getAccessToken() {
-  return accessToken;
+  // Option 1: serviceAccountKey.json (root or scripts directory, or via env)
+  const keyCandidates = [
+    process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    path.join(__dirname, '..', 'serviceAccountKey.json'),
+    path.join(__dirname, 'serviceAccountKey.json'),
+  ];
+
+  for (const candidate of keyCandidates) {
+    if (candidate && fs.existsSync(candidate)) {
+      try {
+        const keyData = JSON.parse(fs.readFileSync(candidate, 'utf8'));
+        console.log(`🔑 Using service account key from: ${candidate}`);
+        const credential = cert(keyData);
+        const token = await credential.getAccessToken();
+        if (token && token.access_token) {
+          return token.access_token;
+        }
+      } catch (err) {
+        console.warn(`⚠️  Failed reading service account from ${candidate}:`, err.message);
+      }
+    }
+  }
+
+  // Option 2: Fall back to firebase login stored credentials
+  const configPath = path.join(os.homedir(), '.config', 'configstore', 'firebase-tools.json');
+  try {
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    const token = config?.tokens?.access_token;
+    if (token) {
+      console.log('🔑 Using access token from firebase-tools CLI session.');
+      return token;
+    }
+  } catch (_) {}
+
+  console.error('❌ Authentication failed. Please provide credentials via either:');
+  console.error('   1) Place your Firebase serviceAccountKey.json in the project root');
+  console.error('      (or export GOOGLE_APPLICATION_CREDENTIALS="path/to/serviceAccountKey.json")');
+  console.error('   2) Run: firebase login (to authenticate via Firebase CLI)\n');
+  process.exit(1);
 }
 
 // ─── Categories ────────────────────────────────────────────────────────────

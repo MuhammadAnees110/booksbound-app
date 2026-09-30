@@ -110,24 +110,14 @@ The PDF specification is the authoritative requirement source. The implemented a
 
 The app uses Firebase Authentication with email/password sign-in. For demonstration, assessor accounts can be created directly in Firebase Console or during the local app setup.
 
-### Recommended assessor accounts
+### 6.3 Test Accounts
 
-Admin account:
+| Account | Email | Password | Role |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin@booksbound.demo` | `Admin@123` | `admin` |
+| **Customer** | `customer@booksbound.demo` | `Customer@123` | `user` |
+| **Password reset** | `reset@booksbound.demo` | `Reset@123` | |
 
-- Email: `admin@booksbound.demo`
-- Password: `Admin@123`
-- Role: `admin`
-
-Customer test account:
-
-- Email: `customer@booksbound.demo`
-- Password: `Customer@123`
-- Role: `user`
-
-Password reset test account:
-
-- Email: `reset@booksbound.demo`
-- Password: `Reset@123`
 
 ### How to assign admin access
 

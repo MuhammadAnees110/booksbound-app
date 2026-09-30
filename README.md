@@ -33,8 +33,14 @@ The BookStore Application provides a complete digital storefront for browsing, s
 
 ## 🔐 Credentials for Testing
 
-- **Admin Account:** admin@bookstore.com / Admin@12345
-- **Test User Account:** user@bookstore.com / User@12345
+### 6.3 Test Accounts
+
+| Account | Email | Password | Role |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin@booksbound.demo` | `Admin@123` | `admin` |
+| **Customer** | `customer@booksbound.demo` | `Customer@123` | `user` |
+| **Password reset** | `reset@booksbound.demo` | `Reset@123` | |
+
 
 ## 📋 Security & Compliance
 
