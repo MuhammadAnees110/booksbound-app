@@ -6,7 +6,10 @@
  * Uses firebase-admin with the token from firebase-tools.json (no gcloud needed).
  */
 
-const { initializeApp, cert } = require('firebase-admin/app');
+let cert = null;
+try {
+  ({ cert } = require('firebase-admin/app'));
+} catch (_) {}
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
@@ -20,7 +23,7 @@ async function getAccessToken() {
   ];
 
   for (const candidate of keyCandidates) {
-    if (candidate && fs.existsSync(candidate)) {
+    if (candidate && fs.existsSync(candidate) && cert) {
       try {
         const keyData = JSON.parse(fs.readFileSync(candidate, 'utf8'));
         console.log(`🔑 Using service account key from: ${candidate}`);
@@ -189,6 +192,7 @@ async function seed() {
       description:        book.description,
       coverUrl:           book.coverUrl,
       price:              book.price,
+      stock:              20,
       rating:             book.rating,
       isBestseller:       book.isBestseller,
       isbn:               book.isbn,
@@ -199,7 +203,52 @@ async function seed() {
   }
   console.log(`\n   ✅ ${books.length} books written.\n`);
 
-  console.log('🎉 Done! Open your app — categories and books should appear.');
+  // ── Users ───────────────────────────────────────────────────────────────
+  console.log('👤 Writing user profiles...');
+  const testUsers = [
+    {
+      email: 'admin@booksbound.demo',
+      role: 'admin',
+      displayName: 'Admin User',
+      uid: 'lmaEt1xyhHg9QURAMdCZAVvURii1',
+    },
+    {
+      email: 'customer@booksbound.demo',
+      role: 'user',
+      displayName: 'Customer User',
+      uid: 'yQnd2wEcyhNFImpSDcw3kXzim0t2',
+    },
+    {
+      email: 'reset@booksbound.demo',
+      role: 'user',
+      displayName: 'Reset Test User',
+      uid: 'x6GBv02M3lZTrP0pn7hmfivER1K2',
+    },
+  ];
+
+  for (const user of testUsers) {
+    const userData = {
+      uid: user.uid,
+      name: user.displayName,
+      displayName: user.displayName,
+      email: user.email,
+      role: user.role,
+      photoUrl: '',
+      createdAt: new Date().toISOString(),
+      wishlist: [],
+      ratings: {},
+      isBlocked: false,
+    };
+    for (const col of ['user', 'users']) {
+      try {
+        await restSet(accessToken, col, user.uid, userData);
+      } catch (_) {}
+    }
+    process.stdout.write('.');
+  }
+  console.log(`\n   ✅ ${testUsers.length} test user profiles written.\n`);
+
+  console.log('🎉 Done! Open your app — categories, books, and test users are ready.');
 }
 
 seed().catch(err => {

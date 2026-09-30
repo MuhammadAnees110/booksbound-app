@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class UserModel {
   final String? uid;
   final String name;
@@ -23,20 +25,33 @@ class UserModel {
     this.isBlocked = false,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> map) {
+  factory UserModel.fromJson(Map<String, dynamic> map, {String? uid}) =>
+      UserModel.fromMap(map, uid: uid);
+
+  factory UserModel.fromMap(Map<String, dynamic> map, {String? uid}) {
+    DateTime parsedDate;
+    if (map['createdAt'] is Timestamp) {
+      parsedDate = (map['createdAt'] as Timestamp).toDate();
+    } else if (map['createdAt'] is String) {
+      parsedDate = DateTime.tryParse(map['createdAt']) ?? DateTime.now();
+    } else {
+      parsedDate = DateTime.now();
+    }
+
     return UserModel(
-      uid: map['uid'],
-      name: map['name'] ?? '',
-      email: map['email'] ?? '',
-      password: map['password'] ?? '',
-      photoUrl: map['photoUrl'],
-      createdAt: map['createdAt'] != null
-          ? DateTime.parse(map['createdAt'])
-          : DateTime.now(),
+      uid: uid ?? (map['uid'] as String?),
+      name: (map['name'] as String?) ?? (map['displayName'] as String?) ?? '',
+      email: (map['email'] as String?) ?? '',
+      password: (map['password'] as String?) ?? '',
+      photoUrl: map['photoUrl'] as String?,
+      createdAt: parsedDate,
       wishlist: List<String>.from(map['wishlist'] ?? []),
-      ratings: Map<String, double>.from(map['ratings'] ?? {}),
-      role: map['role'] ?? "user",
-      isBlocked: map['isBlocked'] ?? false,
+      ratings: (map['ratings'] as Map<dynamic, dynamic>?)?.map(
+            (k, v) => MapEntry(k.toString(), (v as num).toDouble()),
+          ) ??
+          {},
+      role: (map['role'] as String?) ?? "user",
+      isBlocked: (map['isBlocked'] as bool?) ?? false,
     );
   }
 
@@ -44,6 +59,7 @@ class UserModel {
     return {
       'uid': uid,
       'name': name,
+      'displayName': name,
       'email': email,
       'photoUrl': photoUrl,
       'createdAt': createdAt.toIso8601String(),
