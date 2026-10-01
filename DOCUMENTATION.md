@@ -105,7 +105,8 @@ User profile documents (`user/{uid}`) are readable by other signed-in users (nee
 ### Notes for the assessor
 
 - **Google sign-in** requires the Google provider to be enabled in Firebase Console → Authentication → Sign-in method. For the Android build, the signing key's SHA-1 fingerprint must also be added under Project settings → Your apps.
-- **Video demonstration**: follow the outline in Section 8; the recording is supplied in `Media_and_Assets/Videos/` of the submission package.
+- **Video demonstration**: `Media_and_Assets/Videos/demo_video.mp4` in the submission package (outline in Section 8).
+- **Diagrams**: architecture, ERD and order state diagrams in `docs/diagrams/`.
 
 ### Non-functional requirements traceability
 

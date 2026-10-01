@@ -86,6 +86,15 @@ A pre-compiled standalone release APK is provided alongside this source archive:
 ### Screenshots
 Screens captured from the running app are in `Media_and_Assets/Screenshots/`: login with Google sign-in, home (categories, authors, bestsellers), book details, books by author, profile, shipping addresses, payment methods, add-card form, cart, checkout with saved address and payment choice, order confirmation, live order tracking (Shipped and Delivered), admin order management, and Help & FAQ. Files prefixed `android_` were captured from the release APK running on an Android emulator.
 
+### Diagrams
+In `Media_and_Assets/Diagrams/` (SVG + PNG, also in `docs/diagrams/`):
+- `01_system_architecture` — Flutter app layers, Firebase services (Auth, Firestore, Storage, App Check, Analytics) and the jsDelivr media CDN
+- `02_database_erd` — Firestore collections, owner-only subcollections (addresses, payment methods, ratings) and embedded objects
+- `03_order_status_state_diagram` — Pending → Processing → Shipped → Delivered, plus Cancelled
+
+### Demo Video
+`Media_and_Assets/Videos/demo_video.mp4` (about 6 minutes, captioned, H.264 MP4) recorded from the running app: Google sign-in option, catalog and sorting, browse by author, search, saving a shipping address and card, cart and checkout, live order tracking, admin order status updates, blocking and unblocking a user, and the Help & FAQ screen.
+
 ### 5. Technical Documentation
 Full technical documentation is located in the [`docs/`](docs/README.md) directory:
 - [docs/README.md](docs/README.md) — Master documentation index

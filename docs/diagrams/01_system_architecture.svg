@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 890" width="1400" height="890" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"/>
+    </marker>
+  <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+    <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d97706"/></marker>
+    <marker id="arrP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/></marker>
+    <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/></marker>
+  </defs>
+  <rect width="1400" height="890" fill="#ffffff"/>
+
+  <text x="40" y="52" font-size="28" font-weight="700" fill="#111827">BooksBound — System Architecture</text>
+  <text x="40" y="80" font-size="15" fill="#6b7280">Flutter client (Android APK and Web) talking to Firebase services; book media served from a Git-backed jsDelivr CDN</text>
+
+  <!-- ============ CLIENT ============ -->
+  <rect x="40" y="105" width="560" height="740" rx="16" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="62" y="138" font-size="19" font-weight="700" fill="#1e3a8a">Flutter App (Dart) — Android · Web</text>
+
+  <!-- Presentation -->
+  <rect x="62" y="156" width="516" height="186" rx="10" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="80" y="182" font-size="16" font-weight="700" fill="#1f2937">Presentation — lib/features/*</text>
+  <g font-size="13.5" fill="#374151">
+    <text x="80" y="208">• Auth: email/password, Google sign-in</text>
+    <text x="80" y="230">• Catalog: genres, authors, bestsellers</text>
+    <text x="80" y="252">• Search &amp; sort (price, newest, popularity)</text>
+    <text x="80" y="274">• Book details, ratings, reviews, likes</text>
+    <text x="80" y="296">• Wishlist · Help &amp; FAQ</text>
+    <text x="330" y="208">• Cart (quantities, live total)</text>
+    <text x="330" y="230">• Checkout: saved address + card / COD</text>
+    <text x="330" y="252">• Profile: addresses, payment methods</text>
+    <text x="330" y="274">• Orders + live tracking timeline</text>
+    <text x="330" y="296">• Admin: books, orders, users, reviews</text>
+  </g>
+  <text x="80" y="326" font-size="12.5" fill="#6b7280">AdminRouteGuard protects admin routes · OfflineBanner · skeleton loaders</text>
+
+  <line x1="320" y1="342" x2="320" y2="372" stroke="#374151" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- State -->
+  <rect x="62" y="374" width="516" height="112" rx="10" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="80" y="400" font-size="16" font-weight="700" fill="#1f2937">State — Provider / ChangeNotifier</text>
+  <g font-size="13.5" fill="#374151">
+    <text x="80" y="426">BookProvider (catalog, search, sort, authors) · CartProvider (in-memory)</text>
+    <text x="80" y="448">UserAuthProvider · ProfileProvider (role) · WishlistProvider</text>
+    <text x="80" y="470">ReviewsProvider · RatingsProvider · ThemeProvider</text>
+  </g>
+
+  <line x1="320" y1="486" x2="320" y2="516" stroke="#374151" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Services -->
+  <rect x="62" y="518" width="516" height="150" rx="10" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="80" y="544" font-size="16" font-weight="700" fill="#1f2937">Services — lib/services/*</text>
+  <g font-size="13.5" fill="#374151">
+    <text x="80" y="570">AuthService · UserService/ProfileService · BooksService</text>
+    <text x="80" y="592">OrderService · AccountDetailsService (addresses, cards)</text>
+    <text x="80" y="614">ReviewsService · RatingsService · WishlistService · CategoryService</text>
+    <text x="80" y="640" fill="#6b7280" font-size="12.5">Every call returns Result&lt;T&gt;; ErrorMapper turns Firebase errors into user messages</text>
+  </g>
+
+  <!-- On device -->
+  <rect x="62" y="690" width="516" height="134" rx="10" fill="#f9fafb" stroke="#d1d5db" stroke-dasharray="6 4"/>
+  <text x="80" y="716" font-size="16" font-weight="700" fill="#1f2937">On-device storage</text>
+  <g font-size="13.5" fill="#374151">
+    <text x="80" y="742">• Firestore offline persistence (cached reads)</text>
+    <text x="80" y="764">• Image disk + memory cache (cached_network_image)</text>
+    <text x="80" y="786">• SharedPreferences (theme preference)</text>
+    <text x="80" y="808">• connectivity_plus → offline banner &amp; guards</text>
+  </g>
+
+  <!-- ============ FIREBASE ============ -->
+  <rect x="700" y="105" width="660" height="500" rx="16" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <text x="722" y="138" font-size="19" font-weight="700" fill="#92400e">Firebase project · booksbound-app-boka18 (Spark plan)</text>
+
+  <rect x="722" y="156" width="300" height="118" rx="10" fill="#ffffff" stroke="#fcd34d"/>
+  <text x="740" y="182" font-size="16" font-weight="700" fill="#1f2937">Authentication</text>
+  <g font-size="13.5" fill="#374151">
+    <text x="740" y="208">• Email / password</text>
+    <text x="740" y="230">• Google provider (social login)</text>
+    <text x="740" y="252">• Password reset email</text>
+  </g>
+
+  <rect x="1038" y="156" width="300" height="118" rx="10" fill="#ffffff" stroke="#fcd34d"/>
+  <text x="1056" y="182" font-size="16" font-weight="700" fill="#1f2937">Cloud Storage</text>
+  <g font-size="13.5" fill="#374151">
+    <text x="1056" y="208">• Profile pictures</text>
+    <text x="1056" y="230">• Admin-uploaded book covers</text>
+    <text x="1056" y="252">• storage.rules: owner + 5 MB limit</text>
+  </g>
+
+  <rect x="722" y="290" width="616" height="176" rx="10" fill="#ffffff" stroke="#fcd34d"/>
+  <text x="740" y="316" font-size="16" font-weight="700" fill="#1f2937">Cloud Firestore (NoSQL, real-time)</text>
+  <g font-size="13.5" fill="#374151">
+    <text x="740" y="342">Collections: user · books · orders · categories · config</text>
+    <text x="740" y="364">Owner-only subcollections: user/{uid}/addresses · payment_methods · ratings</text>
+    <text x="740" y="386">Real-time snapshots drive order tracking and admin order list</text>
+  </g>
+  <rect x="740" y="400" width="580" height="52" rx="8" fill="#fef3c7"/>
+  <text x="756" y="422" font-size="13.5" font-weight="600" fill="#92400e">firestore.rules — role-based access</text>
+  <text x="756" y="442" font-size="12.5" fill="#92400e">admins manage books &amp; orders, block users · users edit only their own data</text>
+
+  <rect x="722" y="482" width="300" height="104" rx="10" fill="#ffffff" stroke="#fcd34d"/>
+  <text x="740" y="508" font-size="16" font-weight="700" fill="#1f2937">App Check</text>
+  <g font-size="13.5" fill="#374151">
+    <text x="740" y="534">• Play Integrity (Android)</text>
+    <text x="740" y="556">• Debug provider in dev builds</text>
+  </g>
+
+  <rect x="1038" y="482" width="300" height="104" rx="10" fill="#ffffff" stroke="#fcd34d"/>
+  <text x="1056" y="508" font-size="16" font-weight="700" fill="#1f2937">Analytics</text>
+  <g font-size="13.5" fill="#374151">
+    <text x="1056" y="534">• sign_up, login, search, view_item</text>
+    <text x="1056" y="556">• add_to_cart, purchase, wishlist</text>
+  </g>
+
+  <!-- ============ CDN ============ -->
+  <rect x="700" y="645" width="660" height="200" rx="16" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="722" y="678" font-size="19" font-weight="700" fill="#14532d">Media delivery (static assets)</text>
+  <rect x="722" y="696" width="270" height="128" rx="10" fill="#ffffff" stroke="#86efac"/>
+  <text x="740" y="722" font-size="16" font-weight="700" fill="#1f2937">GitHub repository</text>
+  <g font-size="13.5" fill="#374151">
+    <text x="740" y="748">chotabahi/book-app-assets</text>
+    <text x="740" y="770">24 covers · 8 category images</text>
+    <text x="740" y="792">update-cdn-urls.js writes</text>
+    <text x="740" y="812">URLs into Firestore</text>
+  </g>
+  <line x1="992" y1="760" x2="1062" y2="760" stroke="#374151" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="1064" y="696" width="274" height="128" rx="10" fill="#ffffff" stroke="#86efac"/>
+  <text x="1082" y="722" font-size="16" font-weight="700" fill="#1f2937">jsDelivr CDN</text>
+  <g font-size="13.5" fill="#374151">
+    <text x="1082" y="748">cdn.jsdelivr.net/gh/…@main</text>
+    <text x="1082" y="770">Global edge cache</text>
+    <text x="1082" y="792">Referenced by coverUrl /</text>
+    <text x="1082" y="812">imageUrl fields</text>
+  </g>
+
+  <!-- ============ CONNECTORS (routed through the gutter) ============ -->
+  <g stroke-width="2.2" fill="none">
+    <path d="M578 560 H650 V215 H718" stroke="#2563eb" marker-end="url(#arrB)"/>
+    <path d="M578 590 H665 V378 H718" stroke="#d97706" marker-end="url(#arrA)"/>
+    <path d="M578 620 H680 V94 H1385 V215 H1342" stroke="#7c3aed" marker-end="url(#arrP)"/>
+    <path d="M578 300 H620 V862 H1200 V828" stroke="#16a34a" marker-end="url(#arrG)"/>
+  </g>
+  <!-- legend -->
+  <g font-size="13" fill="#374151">
+    <rect x="890" y="24" width="470" height="58" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+    <line x1="906" y1="44" x2="930" y2="44" stroke="#2563eb" stroke-width="3"/><text x="936" y="49">Auth SDK calls</text>
+    <line x1="1060" y1="44" x2="1084" y2="44" stroke="#d97706" stroke-width="3"/><text x="1090" y="49">Firestore queries + live snapshots</text>
+    <line x1="906" y1="68" x2="930" y2="68" stroke="#7c3aed" stroke-width="3"/><text x="936" y="73">Storage uploads</text>
+    <line x1="1060" y1="68" x2="1084" y2="68" stroke="#16a34a" stroke-width="3"/><text x="1090" y="73">HTTPS image requests (CachedImage)</text>
+  </g>
+</svg>

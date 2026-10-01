@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1040" width="1500" height="1040" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="many" viewBox="0 0 16 16" refX="15" refY="8" markerWidth="14" markerHeight="14" orient="auto">
+      <path d="M15,1 L1,8 L15,15 M1,8 L15,8" stroke="#374151" stroke-width="1.6" fill="none"/>
+    </marker>
+    <marker id="one" viewBox="0 0 16 16" refX="2" refY="8" markerWidth="14" markerHeight="14" orient="auto">
+      <path d="M4,1 L4,15 M9,1 L9,15" stroke="#374151" stroke-width="1.6" fill="none"/>
+    </marker>
+  </defs>
+  <rect width="1500" height="1040" fill="#ffffff"/>
+  <text x="40" y="52" font-size="28" font-weight="700" fill="#111827">BooksBound — Cloud Firestore Data Model (ERD)</text>
+  <text x="40" y="80" font-size="15" fill="#6b7280">Document collections, owner-only subcollections and embedded arrays. PK = document id · FK = stored reference id</text>
+
+  <!-- ===== user ===== -->
+  <g>
+    <rect x="40" y="110" width="400" height="330" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <rect x="40" y="110" width="400" height="40" rx="10" fill="#2563eb"/>
+    <rect x="40" y="135" width="400" height="15" fill="#2563eb"/>
+    <text x="58" y="137" font-size="17" font-weight="700" fill="#ffffff">user / {uid}</text>
+    <g font-size="14" fill="#1f2937">
+      <text x="58" y="178"><tspan font-weight="700">PK</tspan>  uid : string (Firebase Auth uid)</text>
+      <text x="58" y="203">name, displayName : string</text>
+      <text x="58" y="228">email : string</text>
+      <text x="58" y="253">photoUrl : string? (Storage URL)</text>
+      <text x="58" y="278">role : "user" | "admin"</text>
+      <text x="58" y="303">isBlocked : bool (admin-controlled)</text>
+      <text x="58" y="328">wishlist : string[] → books.id</text>
+      <text x="58" y="353">createdAt : ISO date</text>
+    </g>
+    <text x="58" y="388" font-size="12.5" fill="#6b7280">Readable by signed-in users (reviewer names/avatars);</text>
+    <text x="58" y="406" font-size="12.5" fill="#6b7280">owner edits own fields except role/isBlocked;</text>
+    <text x="58" y="424" font-size="12.5" fill="#6b7280">admin may change only isBlocked and role.</text>
+  </g>
+
+  <!-- ===== subcollections ===== -->
+  <g>
+    <rect x="40" y="500" width="400" height="250" rx="10" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+    <rect x="40" y="500" width="400" height="40" rx="10" fill="#7c3aed"/>
+    <rect x="40" y="525" width="400" height="15" fill="#7c3aed"/>
+    <text x="58" y="527" font-size="17" font-weight="700" fill="#ffffff">user/{uid}/addresses / {id}</text>
+    <g font-size="14" fill="#1f2937">
+      <text x="58" y="568"><tspan font-weight="700">PK</tspan>  id : auto id</text>
+      <text x="58" y="593">label : string (Home, Work…)</text>
+      <text x="58" y="618">fullName, phone : string</text>
+      <text x="58" y="643">street, city, postalCode : string</text>
+      <text x="58" y="668">country : string</text>
+      <text x="58" y="693">isDefault : bool (one per user)</text>
+    </g>
+    <text x="58" y="728" font-size="12.5" fill="#7c3aed">Owner-only (rules: /{allSubcollections=**})</text>
+  </g>
+
+  <g>
+    <rect x="40" y="790" width="400" height="220" rx="10" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+    <rect x="40" y="790" width="400" height="40" rx="10" fill="#7c3aed"/>
+    <rect x="40" y="815" width="400" height="15" fill="#7c3aed"/>
+    <text x="58" y="817" font-size="17" font-weight="700" fill="#ffffff">user/{uid}/payment_methods / {id}</text>
+    <g font-size="14" fill="#1f2937">
+      <text x="58" y="858"><tspan font-weight="700">PK</tspan>  id : auto id</text>
+      <text x="58" y="883">brand : Visa | Mastercard | Amex…</text>
+      <text x="58" y="908">last4 : string (only 4 digits)</text>
+      <text x="58" y="933">holderName, expiry (MM/YY)</text>
+      <text x="58" y="958">isDefault : bool</text>
+    </g>
+    <text x="58" y="992" font-size="12.5" fill="#7c3aed">Full card number and CVV are never stored</text>
+  </g>
+
+  <g>
+    <rect x="480" y="790" width="300" height="140" rx="10" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+    <rect x="480" y="790" width="300" height="40" rx="10" fill="#7c3aed"/>
+    <rect x="480" y="815" width="300" height="15" fill="#7c3aed"/>
+    <text x="498" y="817" font-size="17" font-weight="700" fill="#ffffff">user/{uid}/ratings / {bookId}</text>
+    <g font-size="14" fill="#1f2937">
+      <text x="498" y="858"><tspan font-weight="700">PK/FK</tspan>  bookId → books.id</text>
+      <text x="498" y="883">rating : number (1–5)</text>
+      <text x="498" y="908">updatedAt : server timestamp</text>
+    </g>
+  </g>
+
+  <!-- ===== books ===== -->
+  <g>
+    <rect x="560" y="110" width="440" height="420" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+    <rect x="560" y="110" width="440" height="40" rx="10" fill="#0f766e"/>
+    <rect x="560" y="135" width="440" height="15" fill="#0f766e"/>
+    <text x="578" y="137" font-size="17" font-weight="700" fill="#ffffff">books / {id}</text>
+    <g font-size="14" fill="#1f2937">
+      <text x="578" y="178"><tspan font-weight="700">PK</tspan>  id : auto id</text>
+      <text x="578" y="203">title, author, isbn, description : string</text>
+      <text x="578" y="228">genre / category : string → categories.name</text>
+      <text x="578" y="253">category_lowercase : string (query helper)</text>
+      <text x="578" y="278">coverUrl : string (jsDelivr CDN / Storage)</text>
+      <text x="578" y="303">price : number · stock : int</text>
+      <text x="578" y="328">isBestseller : bool · releaseDate : Timestamp</text>
+      <text x="578" y="353">rating : number (average)</text>
+      <text x="578" y="378">reviews : Review[]  (embedded)</text>
+    </g>
+    <rect x="578" y="394" width="404" height="120" rx="8" fill="#f0fdfa" stroke="#99f6e4"/>
+    <text x="594" y="418" font-size="14" font-weight="700" fill="#0f766e">Review (embedded object)</text>
+    <g font-size="13.5" fill="#1f2937">
+      <text x="594" y="442">userId → user.uid · userName : string</text>
+      <text x="594" y="464">comment : string · createdAt : ISO date</text>
+      <text x="594" y="486">likedBy : string[] → user.uid (review likes)</text>
+    </g>
+    <text x="594" y="506" font-size="12" fill="#6b7280">Public read · admin write · users may update reviews/rating only</text>
+  </g>
+
+  <!-- ===== categories ===== -->
+  <g>
+    <rect x="1080" y="110" width="380" height="180" rx="10" fill="#ffffff" stroke="#ca8a04" stroke-width="2"/>
+    <rect x="1080" y="110" width="380" height="40" rx="10" fill="#ca8a04"/>
+    <rect x="1080" y="135" width="380" height="15" fill="#ca8a04"/>
+    <text x="1098" y="137" font-size="17" font-weight="700" fill="#ffffff">categories / {id}</text>
+    <g font-size="14" fill="#1f2937">
+      <text x="1098" y="178"><tspan font-weight="700">PK</tspan>  id : string (e.g. "fiction")</text>
+      <text x="1098" y="203">name : string</text>
+      <text x="1098" y="228">imageUrl : string (CDN)</text>
+      <text x="1098" y="253">description : string</text>
+    </g>
+    <text x="1098" y="278" font-size="12.5" fill="#6b7280">Public read · admin write</text>
+  </g>
+
+  <!-- ===== orders ===== -->
+  <g>
+    <rect x="1080" y="350" width="380" height="470" rx="10" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
+    <rect x="1080" y="350" width="380" height="40" rx="10" fill="#dc2626"/>
+    <rect x="1080" y="375" width="380" height="15" fill="#dc2626"/>
+    <text x="1098" y="377" font-size="17" font-weight="700" fill="#ffffff">orders / {id}</text>
+    <g font-size="14" fill="#1f2937">
+      <text x="1098" y="418"><tspan font-weight="700">PK</tspan>  id : timestamp-based string</text>
+      <text x="1098" y="443"><tspan font-weight="700">FK</tspan>  userId → user.uid</text>
+      <text x="1098" y="468">items : OrderItem[] (embedded)</text>
+      <text x="1098" y="493">totalAmount : number</text>
+      <text x="1098" y="518">shippingAddress : string (snapshot)</text>
+      <text x="1098" y="543">paymentMethod : "Cash on Delivery" |</text>
+      <text x="1098" y="563">            "Visa •••• 4242" (label)</text>
+      <text x="1098" y="588">status : Pending | Processing | Shipped |</text>
+      <text x="1098" y="608">            Delivered | Cancelled</text>
+      <text x="1098" y="633">statusHistory : {status, at}[]</text>
+      <text x="1098" y="658">createdAt : Timestamp</text>
+    </g>
+    <rect x="1098" y="676" width="344" height="76" rx="8" fill="#fef2f2" stroke="#fecaca"/>
+    <text x="1114" y="700" font-size="14" font-weight="700" fill="#b91c1c">OrderItem (embedded)</text>
+    <text x="1114" y="722" font-size="13.5" fill="#1f2937">book : Book snapshot (id, title, price…)</text>
+    <text x="1114" y="742" font-size="13.5" fill="#1f2937">quantity : int</text>
+    <text x="1098" y="782" font-size="12.5" fill="#6b7280">Owner creates &amp; reads own orders;</text>
+    <text x="1098" y="800" font-size="12.5" fill="#6b7280">admin reads all and updates status.</text>
+  </g>
+
+  <!-- ===== config ===== -->
+  <g>
+    <rect x="1080" y="860" width="380" height="110" rx="10" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+    <rect x="1080" y="860" width="380" height="40" rx="10" fill="#6b7280"/>
+    <rect x="1080" y="885" width="380" height="15" fill="#6b7280"/>
+    <text x="1098" y="887" font-size="17" font-weight="700" fill="#ffffff">config / {docId}</text>
+    <text x="1098" y="928" font-size="14" fill="#1f2937">App settings</text>
+    <text x="1098" y="952" font-size="12.5" fill="#6b7280">Signed-in read · admin write</text>
+  </g>
+
+  <!-- ===== relationships ===== -->
+  <g stroke="#374151" stroke-width="1.8" fill="none">
+    <!-- user 1..* addresses -->
+    <path d="M150 440 L150 498" marker-start="url(#one)" marker-end="url(#many)"/>
+    <!-- user 1..* payment methods -->
+    <path d="M90 440 L90 470 L20 470 L20 900 L38 900" marker-start="url(#one)" marker-end="url(#many)"/>
+    <!-- user 1..* ratings -->
+    <path d="M400 440 L400 470 L460 470 L460 560 L630 560 L630 788" marker-start="url(#one)" marker-end="url(#many)"/>
+    <!-- ratings *..1 books -->
+    <path d="M730 788 L730 532" marker-start="url(#many)" marker-end="url(#one)"/>
+    <!-- user 1..* orders -->
+    <path d="M440 200 L520 200 L520 96 L1064 96 L1064 445 L1078 445" marker-start="url(#one)" marker-end="url(#many)"/>
+    <!-- user wishlist *..* books -->
+    <path d="M440 328 L558 328" marker-start="url(#many)" marker-end="url(#many)"/>
+    <!-- books *..1 categories -->
+    <path d="M1000 228 L1078 228" marker-start="url(#many)" marker-end="url(#one)"/>
+    <!-- orders items reference books -->
+    <path d="M1078 720 L860 720 L860 532" marker-start="url(#many)" marker-end="url(#one)"/>
+  </g>
+  <g font-size="12.5" fill="#111827">
+    <rect x="158" y="456" width="80" height="20" rx="4" fill="#ffffff"/><text x="162" y="471">has many</text>
+    <rect x="452" y="306" width="96" height="20" rx="4" fill="#ffffff"/><text x="456" y="321">wishlist (M:N)</text>
+    <rect x="1003" y="207" width="58" height="18" rx="4" fill="#ffffff"/><text x="1006" y="220" font-size="12">by genre</text>
+    <rect x="700" y="87" width="110" height="18" rx="4" fill="#ffffff"/><text x="706" y="100">places (userId)</text>
+    <rect x="870" y="700" width="160" height="20" rx="4" fill="#ffffff"/><text x="874" y="715">items snapshot books</text>
+    <rect x="738" y="650" width="100" height="20" rx="4" fill="#ffffff"/><text x="742" y="665">rates (bookId)</text>
+  </g>
+
+  <!-- legend -->
+  <g font-size="13" fill="#374151">
+    <rect x="480" y="960" width="560" height="56" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+    <path d="M500 988 L540 988" stroke="#374151" stroke-width="1.8" marker-start="url(#one)" marker-end="url(#many)"/>
+    <text x="552" y="993">one-to-many</text>
+    <rect x="660" y="979" width="16" height="16" rx="3" fill="#7c3aed"/>
+    <text x="684" y="993">owner-only subcollection</text>
+    <rect x="860" y="979" width="16" height="16" rx="3" fill="#f0fdfa" stroke="#99f6e4"/>
+    <text x="884" y="993">embedded object</text>
+  </g>
+</svg>
