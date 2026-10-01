@@ -44,7 +44,15 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // Use the upload key when key.properties points at an existing
+            // keystore; otherwise fall back to the debug key so evaluators and
+            // fresh clones can still build an installable release APK.
+            val uploadKey = signingConfigs.getByName("release").storeFile
+            signingConfig = if (uploadKey != null && uploadKey.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

@@ -37,7 +37,7 @@ To maintain strict security standards and prevent private keys or client IDs fro
 
 ### 2.1 Untracked Credential Files
 
-The project's [`.gitignore`](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/.gitignore) explicitly excludes the following credential targets:
+The project's [`.gitignore`](../.gitignore) explicitly excludes the following credential targets:
 
 ```gitignore
 # Android Firebase client credentials

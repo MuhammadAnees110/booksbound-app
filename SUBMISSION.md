@@ -76,11 +76,15 @@ flutter run --release
 
 ### 4. Pre-Compiled Release Binary
 A pre-compiled standalone release APK is provided alongside this source archive:
-- File: `BookStore_App.apk` (in the submission root)
+- File: `Executable_APK/BookStore_App.apk`
 - You can install it directly to an Android test device via ADB:
   ```bash
   adb install BookStore_App.apk
   ```
+- The APK is signed with the Android debug key (certificate SHA-1 `79:86:2C:A6:F4:8C:86:C7:07:92:CC:F5:4A:23:E6:58:6D:9C:5F:75`). Release builds use the upload key from `android/key.properties` when that keystore is present and fall back to the debug key otherwise. For "Continue with Google" on Android, this SHA-1 must be registered in Firebase Console → Project settings → Android app.
+
+### Screenshots
+Screens captured from the running app are in `Media_and_Assets/Screenshots/`: login with Google sign-in, home (categories, authors, bestsellers), book details, books by author, profile, shipping addresses, payment methods, add-card form, cart, checkout with saved address and payment choice, order confirmation, live order tracking (Shipped and Delivered), admin order management, and Help & FAQ. Files prefixed `android_` were captured from the release APK running on an Android emulator.
 
 ### 5. Technical Documentation
 Full technical documentation is located in the [`docs/`](docs/README.md) directory:
@@ -90,3 +94,4 @@ Full technical documentation is located in the [`docs/`](docs/README.md) directo
 - [docs/DATABASE_AND_CDN.md](docs/DATABASE_AND_CDN.md) — Firestore collections, schema specs, CDN path conventions, and database seeding instructions
 - [docs/SETUP_AND_BUILD.md](docs/SETUP_AND_BUILD.md) — Development setup, build commands, and security practices
 - [docs/PRESENTATION_NOTES.md](docs/PRESENTATION_NOTES.md) — Technical talking points for code walkthroughs
+- [docs/USER_GUIDE.md](docs/USER_GUIDE.md) — End-user guide, tutorials and FAQ (also in the app under Profile → Help & FAQ)

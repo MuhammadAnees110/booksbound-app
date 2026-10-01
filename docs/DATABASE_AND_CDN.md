@@ -85,7 +85,7 @@ https://cdn.jsdelivr.net/gh/chotabahi/book-app-assets@main/categories/<category_
 
 ## 4. Seeding Firestore via Node.js Script
 
-The repository includes a dedicated seed utility: [`scripts/seed_firestore.js`](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/scripts/seed_firestore.js). This script sets up the 8 standard categories and populates 24 books (3 per category) using proper CDN links and Firestore datatypes.
+The repository includes a dedicated seed utility: [`scripts/seed_firestore.js`](../scripts/seed_firestore.js). This script sets up the 8 standard categories and populates 24 books (3 per category) using proper CDN links and Firestore datatypes.
 
 ### 4.1 Prerequisites
 Ensure Node.js `>= 18.0.0` is installed on your development machine:

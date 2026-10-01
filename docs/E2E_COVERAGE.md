@@ -26,6 +26,13 @@ The E2E suite targets the compiled Flutter web application against the configure
 | `/admin-panel`                                    | Admin panel                                        | Direct non-admin access is denied.                                                                                                    |
 | Admin books/orders/reviews/users/analytics routes | Admin CRUD and reporting                           | Direct non-admin access is denied; CRUD writes require a dedicated admin test project/account and are not attempted.                  |
 | Unknown route and parameter-dependent routes      | Route fallback                                     | Verify malformed direct URLs render the not-found UI rather than a blank page/crash.                                                  |
+| Login `Continue with Google`                      | Social sign-in                                     | Button is present (`requirements.spec.js`). The Google popup itself is not automated.                                                 |
+| `/authors/books`                                  | Books by author                                    | Tapping the author on a book opens that author's books.                                                                               |
+| `/profile/addresses`                              | Shipping addresses                                 | Empty/list state and required-field validation. No address is saved by the suite.                                                     |
+| `/profile/payment-methods`                        | Payment methods                                    | Cash on Delivery shown; invalid card number and expired date rejected. No card is saved.                                              |
+| `/help`                                           | Help & FAQ                                         | User guide and FAQ open and expand.                                                                                                   |
+
+Run without Playwright's video download (ffmpeg) by setting `E2E_VIDEO=off`.
 
 ## Data Safety Boundaries
 

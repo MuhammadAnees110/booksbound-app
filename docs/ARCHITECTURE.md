@@ -93,7 +93,7 @@ These assets are fronted by the jsDelivr open-source CDN:
 
 ## 3. Image Rendering & Caching Strategy
 
-The application enforces a single entry point for all remote and Base64 images: the `CachedImage` widget ([`lib/widgets/cached_image.dart`](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/lib/widgets/cached_image.dart)).
+The application enforces a single entry point for all remote and Base64 images: the `CachedImage` widget ([`lib/widgets/cached_image.dart`](../lib/widgets/cached_image.dart)).
 
 ### 3.1 Architectural Features of `CachedImage`
 
@@ -130,7 +130,7 @@ In production, NoSQL document databases like Firestore can contain documents wit
 
 To eliminate runtime `NullCheck` or `type 'Null' is not a subtype of type 'String'` crashes, all model factory constructors utilize defensive null-aware casting.
 
-### 4.1 Book Model Pattern ([`lib/models/book_model.dart`](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/lib/models/book_model.dart))
+### 4.1 Book Model Pattern ([`lib/models/book_model.dart`](../lib/models/book_model.dart))
 
 ```dart
 factory Book.fromMap(Map<String, dynamic> data, {String id = ''}) {
@@ -163,7 +163,7 @@ factory Book.fromMap(Map<String, dynamic> data, {String id = ''}) {
 }
 ```
 
-### 4.2 Category Model Pattern ([`lib/models/category_model.dart`](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/lib/models/category_model.dart))
+### 4.2 Category Model Pattern ([`lib/models/category_model.dart`](../lib/models/category_model.dart))
 
 ```dart
 factory CategoryModel.fromMap(Map<String, dynamic> map, {String? id}) {

@@ -1,3 +1,4 @@
+import 'package:booksbound_app/services/account_details_service.dart';
 import 'package:booksbound_app/constants/app_constants.dart';
 import 'package:booksbound_app/utils/error_mapper.dart';
 import 'package:booksbound_app/utils/result.dart';
@@ -182,13 +183,16 @@ class ProfileService {
         });
       }
 
-      // 5. Delete user document from Firestore
+      // 5. Delete saved shipping addresses and payment methods
+      await AccountDetailsService().deleteAll();
+
+      // 6. Delete user document from Firestore
       await _firestore
           .collection(AppConstants.usersCollection)
           .doc(currentUser.uid)
           .delete();
 
-      // 6. Delete Firebase Auth account
+      // 7. Delete Firebase Auth account
       await currentUser.delete();
 
       // 8. Log analytics event

@@ -6,11 +6,12 @@ This directory contains the technical documentation, architecture specifications
 
 | Document | Purpose | Audience |
 | :--- | :--- | :--- |
-| **[OVERVIEW.md](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/docs/OVERVIEW.md)** | High-level system summary, business capabilities, core tech stack, and state management model. | All developers, reviewers, technical leads |
-| **[ARCHITECTURE.md](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/docs/ARCHITECTURE.md)** | Layered software design (UI -> Service/Provider -> Firestore), CDN asset delivery pipeline, defensive deserialization, and image caching strategy. | Frontend & backend engineers, architects |
-| **[DATABASE_AND_CDN.md](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/docs/DATABASE_AND_CDN.md)** | Firestore schema definitions for `books` and `categories`, jsDelivr CDN asset pathing conventions, and seeding instructions via Node.js script. | Database administrators, platform engineers |
-| **[SETUP_AND_BUILD.md](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/docs/SETUP_AND_BUILD.md)** | Local environment requirements (Flutter 3.x, Dart 3.x, JDK 17), secret credential handling, release build instructions, and git artifact hygiene. | DevOps engineers, local contributors |
-| **[PRESENTATION_NOTES.md](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/docs/PRESENTATION_NOTES.md)** | Concise technical talking points, architecture rationale, cost/performance trade-offs, and demo flow for code walkthroughs. | Presenters, code reviewers, stakeholders |
+| **[OVERVIEW.md](OVERVIEW.md)** | High-level system summary, business capabilities, core tech stack, and state management model. | All developers, reviewers, technical leads |
+| **[ARCHITECTURE.md](ARCHITECTURE.md)** | Layered software design (UI -> Service/Provider -> Firestore), CDN asset delivery pipeline, defensive deserialization, and image caching strategy. | Frontend & backend engineers, architects |
+| **[DATABASE_AND_CDN.md](DATABASE_AND_CDN.md)** | Firestore schema definitions for `books` and `categories`, jsDelivr CDN asset pathing conventions, and seeding instructions via Node.js script. | Database administrators, platform engineers |
+| **[USER_GUIDE.md](USER_GUIDE.md)** | End-user guide: sign-in, browsing by genre/author, cart and checkout, saved addresses and cards, order tracking, reviews, wishlist, admin guide, and FAQs. | App users, assessors |
+| **[SETUP_AND_BUILD.md](SETUP_AND_BUILD.md)** | Local environment requirements (Flutter 3.x, Dart 3.x, JDK 17), secret credential handling, release build instructions, and git artifact hygiene. | DevOps engineers, local contributors |
+| **[PRESENTATION_NOTES.md](PRESENTATION_NOTES.md)** | Concise technical talking points, architecture rationale, cost/performance trade-offs, and demo flow for code walkthroughs. | Presenters, code reviewers, stakeholders |
 
 ## Key Technical Decisions at a Glance
 

@@ -32,6 +32,11 @@ class Book {
     this.reviews = const [],
   });
 
+  /// Popularity used for "Sort by popularity": average rating weighted by
+  /// how many reviews back it up, with a boost for bestsellers.
+  double get popularityScore =>
+      rating * (1 + reviews.length) + (isBestseller ? 5 : 0);
+
   factory Book.fromJson(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return Book.fromMap(data, id: doc.id);

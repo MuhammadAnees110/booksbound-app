@@ -2,6 +2,8 @@ const { defineConfig, devices } = require('@playwright/test');
 
 const port = Number(process.env.E2E_WEB_PORT ?? 5181);
 const baseURL = `http://127.0.0.1:${port}`;
+// E2E_VIDEO=off skips video capture (needs Playwright's ffmpeg download).
+const failureVideo = process.env.E2E_VIDEO === 'off' ? 'off' : 'retain-on-failure';
 
 module.exports = defineConfig({
   testDir: './tests/e2e',
@@ -35,7 +37,7 @@ module.exports = defineConfig({
         serviceWorkers: 'block',
         screenshot: 'only-on-failure',
         trace: 'retain-on-failure',
-        video: 'retain-on-failure',
+        video: failureVideo,
       },
     },
     {
@@ -78,7 +80,7 @@ module.exports = defineConfig({
     serviceWorkers: 'block',
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
-    video: 'retain-on-failure',
+    video: failureVideo,
   },
   webServer: {
     command: 'npm run serve:web',

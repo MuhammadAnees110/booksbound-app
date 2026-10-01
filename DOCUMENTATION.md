@@ -6,7 +6,7 @@ BooksBound is a Flutter-based bookstore and e-commerce application developed for
 
 The application uses Flutter for the client interface and Firebase for all backend services, including:
 
-- Firebase Authentication for user registration, login, logout, and password reset
+- Firebase Authentication for user registration, login (email/password and Google), logout, and password reset
 - Cloud Firestore for book catalog, users, orders, reviews, and wishlist records
 - Firebase Storage for profile images and uploaded book/media assets
 - Firebase App Check and security rules to protect backend resources
@@ -72,26 +72,40 @@ Named routes are defined in `lib/routes/app_routes.dart` and are connected to th
 
 ## 3. Functional Requirements Coverage Verification
 
-The app implements the requested eProject modules and their core workflows as follows.
+Every functional requirement in the eProject specification (`App-BookStore.doc` / `.pdf`) is implemented:
 
-| Requirement                                   | Status                | Evidence in project                                                                                                                                                                                                        |
-| --------------------------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| User Registration & Authentication            | Partially implemented | Email/password registration, login, logout, password reset, and password change are implemented. Social-media sign-in is not included.                                                                                     |
-| Book Catalog                                  | Implemented           | `lib/features/home/home_screen.dart`, `lib/features/categories/categories_screen.dart`, `lib/providers/book_provider.dart`, `lib/services/books_service.dart`                                                              |
-| Categories, Genres, Bestsellers, New Arrivals | Implemented           | `lib/services/category_service.dart`, `lib/features/categories/category_books_screen.dart`, `lib/providers/category_provider.dart`                                                                                         |
-| Search & Advanced Filtering                   | Implemented           | `lib/features/search/search_screen.dart`, `lib/services/books_service.dart`                                                                                                                                                |
-| User Profiles                                 | Implemented           | `lib/features/profile/profile_screen.dart`, `lib/features/edit_profile/edit_profile_screen.dart`, `lib/services/user_service.dart`                                                                                         |
-| Shipping Address                              | Implemented           | `lib/features/cart/checkout_screen.dart`                                                                                                                                                                                   |
-| Payment Methods                               | Not implemented       | Checkout captures a shipping address and creates an order; no saved payment methods or live payment gateway is included.                                                                                                   |
-| Shopping Cart                                 | Implemented           | `lib/providers/cart_provider.dart`, `lib/features/cart/cart_screen.dart`                                                                                                                                                   |
-| Ratings & Reviews                             | Implemented           | Ratings, written reviews, review display, and review likes are implemented in `lib/providers/reviews_provider.dart`, `lib/features/book_details/widgets/write_review_sheet.dart`, and `lib/services/reviews_service.dart`. |
-| Order Management & Tracking                   | Implemented           | `lib/models/order_model.dart`, `lib/services/order_service.dart`, `lib/features/profile/profile_screen.dart`, `lib/features/admin/manage_orders/manage_orders_screen.dart`                                                 |
-| Admin Panel                                   | Implemented           | `lib/features/admin/admin_panel_screen.dart`, `lib/features/admin/manage_books/manage_books_screen.dart`, `lib/features/admin/manage_users/manage_users_screen.dart`                                                       |
-| Wishlist Management                           | Implemented           | `lib/providers/wishlist_provider.dart`, `lib/services/wishlist_service.dart`, `lib/features/wishlist/wishlist_screen.dart`                                                                                                 |
+| Spec requirement | Status | Where it is implemented |
+| --- | --- | --- |
+| Create account with email **or social media** | Implemented | Email/password: `lib/features/auth/register_screen.dart`. Google sign-in ("Continue with Google"): `lib/features/auth/login_screen.dart`, `AuthService.signInWithGoogle()` in `lib/services/auth_service.dart` |
+| Secure login and logout | Implemented | `lib/services/auth_service.dart`, `lib/providers/user_auth_provider.dart`, Profile → Logout. Blocked accounts are refused at login and on app start |
+| Password reset | Implemented | `lib/features/auth/forgot_password_screen.dart`, Profile → Change Password |
+| Catalog with title, author, genre, description, cover, price | Implemented | `lib/features/home/home_screen.dart`, `lib/features/book_details/book_details_screen.dart` |
+| Books categorized by **genre** and **author** | Implemented | Genres: `lib/features/categories/`. Authors: `lib/features/authors/authors_screen.dart` (Home → Authors, or tap the author name on a book) |
+| Bestsellers and new arrivals | Implemented | Home screen carousels, `BookProvider.bestsellers` / `newArrivals` |
+| Search by title, author, or genre | Implemented | `lib/features/search/search_screen.dart`, `BookProvider.search()` |
+| Sort by price, popularity, release date | Implemented | `lib/widgets/sort_sheet.dart`. Popularity = average rating weighted by number of reviews, plus a bestseller boost (`Book.popularityScore`) |
+| Personal profiles | Implemented | `lib/features/profile/profile_screen.dart`, `lib/features/edit_profile/edit_profile_screen.dart` (name, photo) |
+| Update **shipping addresses** | Implemented | Profile → Shipping Addresses: `lib/features/addresses/addresses_screen.dart` (add, edit, delete, set default). Saved addresses are offered at checkout |
+| Update **payment methods** | Implemented | Profile → Payment Methods: `lib/features/payment_methods/payment_methods_screen.dart`. Cards are validated (Luhn check, expiry); only brand, last 4 digits, holder and expiry are stored. Cash on Delivery is always available. No live payment gateway is charged (academic scope) |
+| Add to cart, adjust quantities, total price | Implemented | `lib/features/cart/cart_screen.dart`, `lib/providers/cart_provider.dart` |
+| Rate books and write reviews | Implemented | `lib/features/book_details/widgets/write_review_sheet.dart`, `lib/services/ratings_service.dart` |
+| Ratings and reviews on book details | Implemented | `lib/features/book_details/book_details_screen.dart` |
+| Like reviews | Implemented | Heart button on each review, `ReviewsProvider.toggleLike()` |
+| Order history | Implemented | Profile → My Orders |
+| Order status updates | Implemented | Admin changes status in `lib/features/admin/manage_orders/manage_orders_screen.dart`; each change is timestamped in the order's `statusHistory` |
+| Track delivery status | Implemented | Tap an order → `lib/features/orders/order_tracking_screen.dart`: live Pending → Processing → Shipped → Delivered timeline with dates |
+| Admin panel: books, user accounts, orders | Implemented | `lib/features/admin/` (manage books, users with block/unblock, orders, reviews, analytics) |
+| Admin add / update / remove books | Implemented | `lib/features/admin/manage_books/manage_books_screen.dart`, `lib/widgets/book_form_dialog.dart` |
+| Wishlist | Implemented | `lib/features/wishlist/wishlist_screen.dart`, `lib/providers/wishlist_provider.dart` |
 
-### PDF requirement gaps and scope notes
+### Data privacy for saved addresses and cards
 
-The PDF specification is the authoritative requirement source. The implemented application covers the core bookstore, cart, review, order, admin, and wishlist workflows. Three PDF items remain outside the current implementation: social-media authentication, saved payment methods/live payment processing, and a separate FAQ/tutorial module. The video demonstration requirement is covered by the recording outline in this document; an actual recording must be supplied separately with the final submission.
+User profile documents (`user/{uid}`) are readable by other signed-in users (needed for reviewer names and avatars), so addresses and cards are **not** stored there. They live in the owner-only subcollections `user/{uid}/addresses` and `user/{uid}/payment_methods`, which the existing Firestore rule `match /{allSubcollections=**}` restricts to the owner and admins. They are deleted when the user deletes their account.
+
+### Notes for the assessor
+
+- **Google sign-in** requires the Google provider to be enabled in Firebase Console → Authentication → Sign-in method. For the Android build, the signing key's SHA-1 fingerprint must also be added under Project settings → Your apps.
+- **Video demonstration**: follow the outline in Section 8; the recording is supplied in `Media_and_Assets/Videos/` of the submission package.
 
 ### Non-functional requirements traceability
 
@@ -100,9 +114,9 @@ The PDF specification is the authoritative requirement source. The implemented a
 - Operability and error handling: service results, Firebase error mapping, loading states, offline guards, and user-facing error messages are implemented.
 - Scalability: feature-first separation, service boundaries, pagination, Firebase-managed infrastructure, and bounded queries support future growth.
 - Security: Firebase Authentication, Firestore RBAC, Storage ownership rules, App Check, and account deletion controls are implemented.
-- User documentation: setup, feature coverage, assessor credentials, demo flow, and packaging guidance are provided in this document and `README.md`.
+- User documentation: an in-app **Help & FAQ** screen (Profile → Help & FAQ, `lib/features/help/help_screen.dart`) with step-by-step tutorials and FAQs, plus `docs/USER_GUIDE.md`.
 - Developer documentation: architecture and security details are provided in `docs/architecture.md` and `docs/security.md`.
-- Video: the recording outline is included in Section 8; the completed video file should be added to the submission package.
+- Video: recording outline in Section 8; the video is in the submission package under `Media_and_Assets/Videos/`.
 
 ---
 
@@ -267,44 +281,48 @@ The following outline is recommended for a clean 5–8 minute project video for 
 - Open the register screen
 - Create a new user account using a demo email
 - Complete sign-in flow
+- Log out, then show "Continue with Google" (social media sign-in)
 - Show login and password reset flow
 
 ### Catalog browsing (1:30–2:30)
 
-- Browse categories and bestseller sections
-- Open a book details page
+- Browse categories, bestsellers and new arrivals
+- Open Home → Authors and browse books by one author
+- Open a book details page (tap the author name to see their other books)
 - Demonstrate title/author/genre listing and cover images
 
 ### Search, wishlist, and cart (2:30–3:30)
 
-- Search by title or author
-- Use filtering / category navigation
+- Search by title, author and genre
+- Sort by price, newest and popularity
 - Add a book to wishlist
 - Add item to cart
 - Adjust quantity and show live recalculation of total
 
 ### Reviews and profile (3:30–4:30)
 
-- Open a book and submit a rating/review
+- Open a book and submit a rating/review, then like a review (heart)
 - Open profile screen
 - Edit profile details and photo
-- Show shipping address being entered during checkout
+- Profile → Shipping Addresses: add an address and set it as default
+- Profile → Payment Methods: add a card (show only last 4 digits are kept)
 
 ### Checkout and order tracking (4:30–5:30)
 
 - Proceed to checkout
-- Enter shipping address
+- Pick the saved address and saved card (or Cash on Delivery)
 - Place order
 - Show order confirmation screen
-- View order history and tracking status in profile
+- Profile → My Orders → tap the order to open the tracking timeline
 
 ### Admin panel (5:30–7:00)
 
 - Login as admin account
 - Open admin dashboard
 - Manage books (add/edit/delete)
-- Open user management screen
-- Open orders panel and update order status
+- Open user management screen and block/unblock a user
+- Open orders panel and update order status (Processing, Shipped, Delivered)
+- Switch back to the customer and show the tracking timeline updated
 
 ### Closing (7:00–8:00)
 

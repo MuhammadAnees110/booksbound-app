@@ -39,6 +39,14 @@ class OrderService {
     );
   }
 
+  Stream<OrderModel?> watchOrder(String orderId) {
+    return _db
+        .collection(AppConstants.ordersCollection)
+        .doc(orderId)
+        .snapshots()
+        .map((doc) => doc.exists ? OrderModel.fromSnapshot(doc) : null);
+  }
+
   Stream<Result<List<OrderModel>>> getAllOrders() {
     return _watchOrders(
       _db
@@ -76,6 +84,9 @@ class OrderService {
     try {
       await _db.collection(AppConstants.ordersCollection).doc(orderId).update({
         'status': status,
+        'statusHistory': FieldValue.arrayUnion([
+          {'status': status, 'at': Timestamp.now()},
+        ]),
       });
       return Result.success(null);
     } on FirebaseAuthException catch (e) {

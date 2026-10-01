@@ -1,4 +1,6 @@
+import 'package:booksbound_app/features/addresses/addresses_screen.dart';
 import 'package:booksbound_app/features/auth/forgot_password_screen.dart';
+import 'package:booksbound_app/features/authors/authors_screen.dart';
 import 'package:booksbound_app/features/auth/login_screen.dart';
 import 'package:booksbound_app/features/auth/register_screen.dart';
 import 'package:booksbound_app/features/admin/admin_panel_screen.dart';
@@ -14,13 +16,17 @@ import 'package:booksbound_app/features/categories/categories_screen.dart';
 import 'package:booksbound_app/features/categories/category_books_screen.dart';
 import 'package:booksbound_app/features/change_password/change_password_screen.dart';
 import 'package:booksbound_app/features/edit_profile/edit_profile_screen.dart';
+import 'package:booksbound_app/features/help/help_screen.dart';
 import 'package:booksbound_app/features/layout/layout.dart';
+import 'package:booksbound_app/features/orders/order_tracking_screen.dart';
+import 'package:booksbound_app/features/payment_methods/payment_methods_screen.dart';
 import 'package:booksbound_app/features/profile/delete_account_screen.dart';
 import 'package:booksbound_app/features/splash/splash_screen.dart';
 import 'package:booksbound_app/features/wishlist/wishlist_screen.dart';
 import 'package:booksbound_app/features/checkout/order_success_screen.dart';
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/models/category_model.dart';
+import 'package:booksbound_app/models/order_model.dart';
 import 'package:booksbound_app/utils/page_transitions.dart';
 import 'package:booksbound_app/widgets/admin_route_guard.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +54,12 @@ class AppRoutes {
   static const analytics = "/admin-panel/analytics";
   static const deleteAccount = '/profile/delete-account';
   static const orderSuccess = '/checkout/order-success';
+  static const addresses = '/profile/addresses';
+  static const paymentMethods = '/profile/payment-methods';
+  static const orderTracking = '/profile/orders/track';
+  static const authors = '/authors';
+  static const authorBooks = '/authors/books';
+  static const help = '/help';
 
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
@@ -94,6 +106,42 @@ class AppRoutes {
           page: const ChangePasswordScreen(),
           settings: settings,
         );
+
+      case addresses:
+        return SlideRightRoute(
+          page: const AddressesScreen(),
+          settings: settings,
+        );
+
+      case paymentMethods:
+        return SlideRightRoute(
+          page: const PaymentMethodsScreen(),
+          settings: settings,
+        );
+
+      case orderTracking:
+        final argument = settings.arguments;
+        if (argument is! OrderModel) return _notFoundRoute(settings);
+        return SlideRightRoute(
+          page: OrderTrackingScreen(order: argument),
+          settings: settings,
+        );
+
+      case authors:
+        return SlideRightRoute(page: const AuthorsScreen(), settings: settings);
+
+      case authorBooks:
+        final argument = settings.arguments;
+        if (argument is! String || argument.isEmpty) {
+          return _notFoundRoute(settings);
+        }
+        return SlideRightRoute(
+          page: AuthorBooksScreen(author: argument),
+          settings: settings,
+        );
+
+      case help:
+        return SlideRightRoute(page: const HelpScreen(), settings: settings);
 
       case wishlist:
         return FadeRoute(page: const WishlistScreen(), settings: settings);

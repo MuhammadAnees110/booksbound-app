@@ -163,7 +163,43 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text("Forgot Password?"),
                     ),
                   ),
+                  const Row(
+                    children: [
+                      Expanded(child: Divider()),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Text("or"),
+                      ),
+                      Expanded(child: Divider()),
+                    ],
+                  ),
                   const SizedBox(height: 10),
+                  Consumer<UserAuthProvider>(
+                    builder: (context, provider, _) => SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: OutlinedButton.icon(
+                        key: const Key('google_sign_in_button'),
+                        icon: const Icon(Icons.g_mobiledata, size: 32),
+                        label: const Text("Continue with Google"),
+                        onPressed: provider.isloading
+                            ? null
+                            : () async {
+                                final result = await provider.loginWithGoogle();
+                                if (!context.mounted) return;
+                                if (!result.isSuccess) {
+                                  ErrorPresenter.show(context, result);
+                                  return;
+                                }
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  appRoutes.main,
+                                );
+                              },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

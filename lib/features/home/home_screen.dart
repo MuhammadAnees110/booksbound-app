@@ -56,6 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const SizedBox(height: 10),
                   _buildCategoriesRow(context),
+                  const SizedBox(height: 10),
+                  _buildAuthorsRow(context, bookProvider.authors.keys.take(12)),
                   const SizedBox(height: 15),
                   _buildBookCarousel(bookProvider.bestsellers, 'Bestsellers'),
                   const SizedBox(height: 20),
@@ -121,6 +123,59 @@ class _HomeScreenState extends State<HomeScreen> {
                   ).pushNamed(appRoutes.categoryBooks, arguments: cat);
                 },
               ).animate().fadeIn(duration: 250.ms).slideX(begin: -0.2);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAuthorsRow(BuildContext context, Iterable<String> authors) {
+    if (authors.isEmpty) return const SizedBox();
+    final names = authors.toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Authors',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(appRoutes.authors);
+                },
+                child: const Text('See All'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        SizedBox(
+          height: 40,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            scrollDirection: Axis.horizontal,
+            itemCount: names.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final author = names[index];
+              return ActionChip(
+                avatar: const Icon(Icons.person_outline, size: 16),
+                label: Text(author),
+                tooltip: 'Author: $author',
+                onPressed: () {
+                  Haptics.light();
+                  Navigator.of(
+                    context,
+                  ).pushNamed(appRoutes.authorBooks, arguments: author);
+                },
+              );
             },
           ),
         ),

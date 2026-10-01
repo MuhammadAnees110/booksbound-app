@@ -16,12 +16,16 @@ service cloud.firestore {
         get(/databases/$(database)/documents/user/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // Users can read profiles; only owners can update non-role profile fields.
+    // Users can read profiles; owners update their own profile fields except
+    // role/isBlocked; admins may only toggle isBlocked (block/unblock users).
     match /user/{userId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && request.resource.data.role == 'user';
-      allow update: if isOwner(userId) &&
-        !('role' in request.resource.data.diff(resource.data).affectedKeys());
+      allow create: if isOwner(userId) && request.resource.data.role == 'user' &&
+        request.resource.data.get('isBlocked', false) == false;
+      allow update: if (isOwner(userId) &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'isBlocked'])) ||
+        (isAdmin() &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isBlocked']));
       allow delete: if isOwner(userId) || isAdmin();
 
       match /{allSubcollections=**} {

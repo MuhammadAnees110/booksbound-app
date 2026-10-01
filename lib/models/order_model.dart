@@ -9,6 +9,8 @@ class OrderModel {
   final String shippingAddress;
   final String status;
   final DateTime createdAt;
+  final String paymentMethod;
+  final List<OrderStatusEvent> statusHistory;
 
   OrderModel({
     required this.id,
@@ -18,6 +20,8 @@ class OrderModel {
     required this.shippingAddress,
     required this.status,
     required this.createdAt,
+    this.paymentMethod = 'Cash on Delivery',
+    this.statusHistory = const [],
   });
 
   Map<String, dynamic> toMap() {
@@ -28,6 +32,8 @@ class OrderModel {
       'shippingAddress': shippingAddress,
       'status': status,
       'createdAt': Timestamp.fromDate(createdAt),
+      'paymentMethod': paymentMethod,
+      'statusHistory': statusHistory.map((e) => e.toMap()).toList(),
     };
   }
 
@@ -44,6 +50,11 @@ class OrderModel {
       shippingAddress: data['shippingAddress'] ?? '',
       status: data['status'] ?? 'Pending',
       createdAt: _parseCreatedAt(data['createdAt']),
+      paymentMethod: (data['paymentMethod'] as String?) ?? 'Cash on Delivery',
+      statusHistory: (data['statusHistory'] as List<dynamic>? ?? [])
+          .whereType<Map<String, dynamic>>()
+          .map(OrderStatusEvent.fromMap)
+          .toList(),
     );
   }
 
@@ -53,4 +64,34 @@ class OrderModel {
     if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
     return DateTime.now();
   }
+
+  /// When the order reached [status], or null if it has not (yet) or the
+  /// order predates status history.
+  DateTime? reachedAt(String status) {
+    for (final event in statusHistory.reversed) {
+      if (event.status.toLowerCase() == status.toLowerCase()) return event.at;
+    }
+    if (status.toLowerCase() == 'pending') return createdAt;
+    return null;
+  }
+}
+
+/// One entry in an order's delivery timeline.
+class OrderStatusEvent {
+  final String status;
+  final DateTime at;
+
+  const OrderStatusEvent({required this.status, required this.at});
+
+  factory OrderStatusEvent.fromMap(Map<String, dynamic> map) {
+    return OrderStatusEvent(
+      status: (map['status'] as String?) ?? '',
+      at: OrderModel._parseCreatedAt(map['at']),
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+    'status': status,
+    'at': Timestamp.fromDate(at),
+  };
 }

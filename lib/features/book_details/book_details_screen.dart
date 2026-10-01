@@ -1,3 +1,4 @@
+import 'package:booksbound_app/routes/app_routes.dart';
 import 'package:booksbound_app/features/book_details/widgets/write_review_sheet.dart';
 import 'package:booksbound_app/models/book_model.dart';
 import 'package:booksbound_app/providers/cart_provider.dart';
@@ -118,9 +119,18 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
             const SizedBox(height: 6),
 
-            Text(
-              'by ${widget.book.author}',
-              style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+            InkWell(
+              onTap: () => Navigator.of(
+                context,
+              ).pushNamed(appRoutes.authorBooks, arguments: widget.book.author),
+              child: Text(
+                'by ${widget.book.author}',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey.shade700,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
             ),
 
             const SizedBox(height: 16),

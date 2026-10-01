@@ -25,6 +25,25 @@ class BookProvider extends ChangeNotifier {
       )
       .toList();
 
+  /// Authors in the catalog with their book counts, most books first.
+  Map<String, int> get authors {
+    final counts = <String, int>{};
+    for (final book in _books) {
+      final name = book.author.trim();
+      if (name.isEmpty) continue;
+      counts[name] = (counts[name] ?? 0) + 1;
+    }
+    final sorted = counts.entries.toList()
+      ..sort((a, b) {
+        final byCount = b.value.compareTo(a.value);
+        return byCount != 0 ? byCount : a.key.compareTo(b.key);
+      });
+    return Map.fromEntries(sorted);
+  }
+
+  List<Book> booksByAuthor(String author) =>
+      _books.where((b) => b.author.trim() == author.trim()).toList();
+
   Future<void> loadBooks() async {
     _isloading = true;
     _error = "";
@@ -66,8 +85,7 @@ class BookProvider extends ChangeNotifier {
         break;
       case SortType.popularity:
         _filteredBooks.sort(
-          (a, b) =>
-              (b.isBestseller ? 1 : 0).compareTo((a.isBestseller ? 1 : 0)),
+          (a, b) => b.popularityScore.compareTo(a.popularityScore),
         );
         break;
       case SortType.newest:

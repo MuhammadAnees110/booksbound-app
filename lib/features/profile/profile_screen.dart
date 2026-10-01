@@ -166,6 +166,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                       _profileTile(
+                        icon: Icons.location_on_outlined,
+                        title: "Shipping Addresses",
+                        onTap: () {
+                          Navigator.of(context).pushNamed(appRoutes.addresses);
+                        },
+                      ),
+                      _profileTile(
+                        icon: Icons.credit_card,
+                        title: "Payment Methods",
+                        onTap: () {
+                          Navigator.of(
+                            context,
+                          ).pushNamed(appRoutes.paymentMethods);
+                        },
+                      ),
+                      _profileTile(
                         icon: Icons.lock,
                         title: "Change Password",
                         onTap: () {
@@ -263,6 +279,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           itemBuilder: (context, index) {
                                             final order = orders[index];
                                             return ListTile(
+                                              onTap: () {
+                                                Navigator.of(context).pop();
+                                                Navigator.of(context).pushNamed(
+                                                  appRoutes.orderTracking,
+                                                  arguments: order,
+                                                );
+                                              },
                                               leading: const Icon(
                                                 Icons.receipt_long_outlined,
                                               ),
@@ -270,9 +293,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 '${order.items.length} item(s) — ${Formatters.formatCurrency(order.totalAmount)}',
                                               ),
                                               subtitle: Text(
-                                                Formatters.formatDate(
-                                                  order.createdAt,
-                                                ),
+                                                '${Formatters.formatDate(order.createdAt)} · Tap to track',
                                               ),
                                               trailing: Chip(
                                                 label: Text(
@@ -282,7 +303,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   ),
                                                 ),
                                                 backgroundColor:
-                                                    order.status == 'delivered'
+                                                    order.status
+                                                            .toLowerCase() ==
+                                                        'delivered'
                                                     ? Colors.green[100]
                                                     : Colors.orange[100],
                                               ),
@@ -331,6 +354,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               },
                             ),
                           );
+                        },
+                      ),
+
+                      _profileTile(
+                        icon: Icons.help_outline,
+                        title: "Help & FAQ",
+                        onTap: () {
+                          Navigator.of(context).pushNamed(appRoutes.help);
                         },
                       ),
 

@@ -22,7 +22,7 @@ These notes provide concise, practical talking points for demonstrating the Book
   - High cache hits at CDN edge nodes give fast load times worldwide without incurring recurring infrastructure costs.
 
 ### B. Image Pipeline Standardization (`CachedImage`)
-- **Key Code Point**: [`lib/widgets/cached_image.dart`](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/lib/widgets/cached_image.dart).
+- **Key Code Point**: [`lib/widgets/cached_image.dart`](../lib/widgets/cached_image.dart).
 - **Talking Points**:
   - Replaced all raw `Image.network` calls throughout customer and admin views with a centralized `CachedImage` widget.
   - Integrates `cached_network_image` with local device disk caching—books load instantly on subsequent sessions even when the device is completely offline.
@@ -30,7 +30,7 @@ These notes provide concise, practical talking points for demonstrating the Book
   - Includes shimmer skeleton placeholders during fetch and transparent fallbacks to local asset icons on network timeouts.
 
 ### C. Defensive Data Deserialization (Zero Crash Philosophy)
-- **Key Code Points**: [`lib/models/book_model.dart`](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/lib/models/book_model.dart) and [`lib/models/category_model.dart`](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/lib/models/category_model.dart).
+- **Key Code Points**: [`lib/models/book_model.dart`](../lib/models/book_model.dart) and [`lib/models/category_model.dart`](../lib/models/category_model.dart).
 - **Talking Points**:
   - NoSQL databases allow schema flexibility, but client apps crash if an administrator accidentally creates a document missing a field or passes an unexpected type.
   - We enforced defensive casting across all constructors:
@@ -42,7 +42,7 @@ These notes provide concise, practical talking points for demonstrating the Book
   - Missing or malformed data degrades gracefully into placeholders instead of triggering fatal uncaught `TypeError` exceptions.
 
 ### D. Repository Security & Build Hygiene
-- **Key Code Point**: [`.gitignore`](file:///d:/PR2-202408B/anees--project/Flutter-Book-Store-App-main/.gitignore).
+- **Key Code Point**: [`.gitignore`](../.gitignore).
 - **Talking Points**:
   - Real-world production projects require clean separation of source code and sensitive infrastructure secrets.
   - We untracked and gitignored `google-services.json`, `GoogleService-Info.plist`, and `serviceAccountKey*.json` to guarantee zero secrets in public commits.
